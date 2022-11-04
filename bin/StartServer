@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $HOME
+nohup pc2server --login site1 --password site1 --contestpassword "contest" >slog 2>&1 &
+
