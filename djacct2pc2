@@ -1,0 +1,61 @@
+#!/bin/bash
+# Convert DOMJudge accounts.tsv file to pc2 accounts_load.tsv
+#
+if test $# -ne 1
+then
+	echo Usage: $0 last_team_number_for_judge
+	exit 2
+fi
+ACCTFILE=accounts.tsv
+TEAMS2_FILE=teams2.tsv
+
+if test ! -s "$ACCTFILE"
+then
+	echo $0: There is no $ACCTFILE present
+	exit 1
+fi
+
+# Header
+echo "site	account	externalid	displayname	permdisplay	alias"
+# First, teams:
+#team\tAdama Science and Technology University\tteam1\treps-math-sprung-arrive
+#team\tAin Shams University - Faculty of Computer and Information Sciences\tteam2\tclip-draw-deny-timing
+#
+# We want the team number and school (team) name
+# We lookup the icpcid in the teams2 file.  That file look slike this:
+#126     704039  17122   U of T Blue     University of Toronto   U of Toronto    CAN     INST-2556
+#127     705632  17123   Warsaw Eagles 2021      University of Warsaw    U Warsaw        POL     INST-2673
+
+
+egrep "^team	" < $ACCTFILE | \
+	sed -n -e 's/^team	//' -e 's/\([^	][^	]*\)	team\([0-9][0-9]*\).*/\1	\2/p'  | \
+	while read line
+	do
+		schoolname="${line%%$'\t'*}"
+		teamnum="${line#*$'\t'}"
+		icpcid=`egrep "^$teamnum	" $TEAMS2_FILE | sed -e 's/^[0-9][0-9]*	\([0-9][0-9]*\).*/\1/'`
+		if test -z "$icpcid"
+		then
+			echo $0: Could not find team $teamnum for school $schoolname in $TEAMS2_FILE 1>&2
+			exit 4
+		fi
+		echo "1	team$teamnum	$icpcid	$schoolname	true	"
+	done
+
+
+# Next:
+#judge	CDS	cds	could-shove-clerk-swore
+#judge	PC^2	pc2	peso-cheek-tyke-floral
+
+lastjudge=$1
+icpcid=999000
+egrep "^(judge|admin)	" < $ACCTFILE | sed -n -e 's/^[a-z][a-z]*	//' -e 's/\([^	][^	]*\)	\([^	][^	]*\).*/\1	\2/p' | \
+	while read line
+	do
+		fullname="${line%%$'\t'*}"
+		alias="${line#*$'\t'}"
+		echo "1	team$lastjudge	$icpcid	$fullname	false	$alias"
+		lastjudge=$((lastjudge-1))
+		icpcid=$((icpcid+1))
+	done
+exit 0
