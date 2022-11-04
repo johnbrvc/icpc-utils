@@ -1,0 +1,39 @@
+The files in this folder enable PC2 to run and judge interactive problems.
+When PC2 judges a submission, it does the following:
+
+1) compiles the contestant's submission
+2) executes it with secret judge data as the standard input
+3) sends the standard output to a file
+4) calls a validator to check the output
+
+For an interative problem, the submission has to be:
+1) compiled
+2) executed with its standard output going to the interactive validator 
+3) read input back from the interactive validator
+4) repeat steps 2 and 3 until completion (be it normal, a timeout, exception, etc.)
+5) the interactive validator will return an exit code of 42 (accepted) or 43 (wrong answer)
+	anything else is some sort of system problem "Other - contact staff",  The XML is
+	written to a temporary file name supplied (see step 6)
+6) run the PC2 validator step and move that temporary file to the PC2 supplied 
+	result file ${resfile}
+
+
+There are a lot of files under here.  Most notable is the "accessdenied" folder which is 
+the problem specification folder from "pretest_dhaka".  The output_validator (interactive validator)
+has been compiled.  In addition, the submission samples in submissions/accepted and submissions/wrong_answer
+have been compiled (C++, C, Python and Java).
+
+There are scripts that start with "dointerxxx" that test various things.  ex: dointerall will test
+all "accepted" submissions against one case of test data from the secret folder under accessdenied.
+dointerallwa will do all the wrong answer submissions against the one case of test data.  Note that
+some of the wrong answer solutions will work on that one case of test  data.  Therefore another script,
+dointerallsecret runs one of the 'wrong_answer' submissions that was accepted through ALL the secret
+test data, and it does fail on at least one case (that's good).
+
+The main driver program that controls the interactive stuff is intrunner.c.  It creates fifos, and
+forks off the interactive validator and the submission after changing the stdin's and stdout's to
+be the fifos.  intrunner wait()'s for the processes to finish and examines the interactive validator's
+exit code to determine if the run was accepted (42) or wrong answer (43).
+
+TODO: catch terminate signal and kill children (this would be for a TLE from PC2).
+

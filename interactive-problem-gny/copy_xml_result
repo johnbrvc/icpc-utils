@@ -1,0 +1,20 @@
+#!/bin/bash
+# Usage is: copy_xml_result result-tmp.xml {:resfile}
+#
+# Replaces the security field with the resfile
+#
+tmpxml="$1"
+resxml="$2"
+
+if test -z "$tmpxml" -o -z "$resxml"
+then
+	echo $0: Bad arguments supplied
+	exit 2
+fi
+if ! /usr/bin/sed -e "s/$tmpxml/$resxml/" < $tmpxml > $resxml
+then
+	echo $0: Can not copy $tmpxml to $resxml
+	exit 1
+fi 
+rm $tmpxml
+exit 0

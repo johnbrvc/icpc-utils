@@ -1,0 +1,19 @@
+#!/bin/bash
+for file in  paul ludo benni bergur \
+	Bjarki.class BjarkiMaxQueries.class \
+	jorke.py pehrs.py ragnar.py reinier.py tobi.py
+do
+case $file in
+*.class)	cmd="/usr/bin/java -cp accessdenied/submissions/accepted "`basename -s .class $file` ;;
+*.py)		cmd="/usr/bin/pypy3 accessdenied/submissions/accepted/$file" ;;
+*)			cmd=accessdenied/submissions/accepted/$file ;;
+esac
+echo Trying $cmd...
+read a
+./intrunner accessdenied/output_validators/validate/validate_out \
+	accessdenied/data/secret/secret__88-all_chars_1.in \
+	accessdenied/data/secret/secret__88-all_chars_1.ans \
+	feedback \
+	res333.xml $cmd
+cat res333.xml
+done

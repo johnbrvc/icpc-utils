@@ -1,0 +1,19 @@
+#!/bin/bash
+# This is the script that is set as the real validator for an interactive submission
+# that was run using intrunner.  Basically, it renames the passed in result xml file to
+# the one requested by PC2.  If none exists, the something bad happened in intrunner,
+# and we'll create a system error
+#
+# Usage is: real_intvalidator result-tmp.xml pc2-result.xml
+#
+# result-tmp.xml is producted by intrunner (see comments in intrunner.c).
+# pc2-result.xml is the ${resfile}
+restmp="$1"
+respc2="$2"
+if test -s "$restmp"
+then
+	mv "$restmp" "$respc2"
+else
+	# Whoops, create a system error!
+fi
+exit 0

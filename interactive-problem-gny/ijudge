@@ -1,0 +1,103 @@
+#!/bin/bash
+# Usage: ijudge solution_src problemdir
+# solution_src is a java, c, c++ or python source submission
+# problemdir is a problem package folder containing the following:
+#	output_validators/*/*_out (the validator exe)
+#	data/secret/*.{in,ans} - judges input and answer files
+#
+# Source file is copied to local folder and compiled
+#
+# ex: ijudge accessdenied/submissions/accepted/bergur.c accessdenied
+#
+if test $# -ne 2
+then
+	echo Usage: $0 solution_src problemdir
+	exit 1
+fi
+srcorig="$1"
+problempkg="$2"
+
+secretdir=$problempkg/data/secret
+if test ! -d "$secretdir"
+then
+	echo $0: $secretdir does not exist!
+	exit 5
+fi
+
+srcfile=`basename $srcorig`
+if ! cp $srcorig $srcfile
+then
+	echo $0: Can not copy source $srcorig to local folder
+	exit 2
+fi
+
+validator=`ls $problempkg/output_validators/*/*_out`
+if test ! -x "$validator"
+then
+	echo $0: There is no output validator found on the path: "$validator"
+	exit 6
+fi
+
+ret=1
+
+# compile src
+case "$srcfile" in
+*.c)	exe=`basename -s .c "$srcfile"`	
+	exefile=$exe
+	/usr/bin/gcc -o $exe -x c -g -O2 -std=gnu17 -static "$srcfile" -lm
+	ret=$?
+	;;
+*.cpp)	exe=`basename -s .cpp "$srcfile"`	
+	exefile=$exe
+	/usr/bin/g++ -o $exe -x c++ -g -O2 -std=gnu++17 -static "$srcfile"
+	ret=$?
+	;;
+*.java)	exefile=`basename -s .java "$srcfile"`
+	exe="/usr/bin/java -cp . -XX:+UseSerialGC -Xss64m -Xms1920m -Xmx1920m $exefile"
+	/usr/bin/javac -encoding UTF-8 -sourcepath . -d . "$srcfile"
+	ret=$?
+	exefile=$exefile.class
+	;;
+*.py)	exe="/usr/bin/pypy3 $srcfile"
+	exefile=__pycache__
+	/usr/bin/pypy3 -m py_compile "$srcfile"
+	ret=$?
+	;;
+*)	echo $0: Unknown source file type for $srcfile
+	exit 3
+	;;
+esac
+
+rm -rf feedback
+mkdir feedback
+
+# Execute for each test case
+for file in $secretdir/*.in
+do
+	# Make answer file
+	dir=`dirname $file`
+	out=$dir/`basename -s .in $file`.ans
+	if test ! -e "$out"
+	then
+		echo $0: No answer file: $out for input file $file
+		exit 6
+	fi
+	echo -n Trying case: `basename $file`
+	./intrunner $validator \
+		$file \
+		$out \
+		feedback \
+		result.xml \
+		$exe
+
+	if ! grep -q Accepted result.xml 
+	then
+		echo " NO"
+	else
+		echo " YES"
+	fi
+done
+
+# cleanup
+rm -rf "$exefile" "$srcfile" feedback result.xml
+exit 0

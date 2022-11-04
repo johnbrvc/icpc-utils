@@ -1,0 +1,7 @@
+#!/bin/bash
+./intrunner accessdenied/output_validators/validate/validate_out \
+	accessdenied/data/secret/secret__88-all_chars_1.in \
+	accessdenied/data/secret/secret__88-all_chars_1.ans \
+	feedback \
+	res333.xml ./K 
+cat res333.xml

@@ -1,0 +1,28 @@
+#!/bin/bash
+if test $# -ne 2
+then
+	echo $0: Usage: $0 Teams-endpoing-url-with-auth-info json-team-field
+	echo "    ex: $0 https://pc2:industrial-swung-extra-day@primary.storm.vu/api/contests/pretest2_dhaka/teams" display_name
+	echo "    or: $0 https://pc2:industrial-swung-extra-day@primary.storm.vu/api/contests/pretest2_dhaka/teams" affiliation
+	exit 1
+fi
+u=$1
+field=$2
+teamsjs=teams_ep_`date +%Y%m%d_%H%M%S`.json
+echo $0: Fetching teams JSON to: $teamsjs...
+if wget -O $teamsjs "$u"
+then
+	echo $0: Generating load_teams.tsv...
+	jq ".[] | .id, .icpc_id, .$field" < $teamsjs | \
+		sed -e 's/.*: //' -e 's/"//g' -e 's/,$//g' >_team.tmp
+	echo -e "site\taccount\texternalid\tdisplayname\tpermdisplay" > load_teams.tsv
+	while read id
+	do
+		read extid
+		read name
+		echo -e "1\tteam$id\t$extid\t$name\ttrue"
+	done < _team.tmp | sort -V >> load_teams.tsv
+else
+	echo $0: Can not generate load_teams.tsv - wget has failed.
+fi
+exit 0

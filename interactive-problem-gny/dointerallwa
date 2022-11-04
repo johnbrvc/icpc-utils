@@ -1,0 +1,19 @@
+#!/bin/bash
+for file in forget_uppercase_letter forget_lowercase_letter forget_digit \
+	ExceedQueries.class InvalidChars.class \
+	max_data.py pehrs.py ragnar-len-19.py empty.py
+do
+case $file in
+*.class)	cmd="/usr/bin/java -cp accessdenied/submissions/wrong_answer "`basename -s .class $file` ;;
+*.py)		cmd="/usr/bin/pypy3 accessdenied/submissions/wrong_answer/$file" ;;
+*)			cmd=accessdenied/submissions/wrong_answer/$file ;;
+esac
+echo Trying $cmd...
+read a
+./intrunner accessdenied/output_validators/validate/validate_out \
+	accessdenied/data/secret/secret__88-all_chars_1.in \
+	accessdenied/data/secret/secret__88-all_chars_1.ans \
+	feedback \
+	res333.xml $cmd
+cat res333.xml
+done

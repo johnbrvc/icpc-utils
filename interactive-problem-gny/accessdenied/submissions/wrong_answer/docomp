@@ -1,0 +1,9 @@
+g++ -o forget_uppercase_letter forget_uppercase_letter.cpp
+g++ -o forget_lowercase_letter forget_lowercase_letter.cpp
+g++ -o forget_digit forget_digit.cpp
+javac ExceedQueries.java
+javac InvalidChars.java
+pypy3 -m py_compile max_data.py
+pypy3 -m py_compile pehrs.py
+pypy3 -m py_compile ragnar-len-19.py
+pypy3 -m py_compile empty.py

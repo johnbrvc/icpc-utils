@@ -1,0 +1,189 @@
+#!/bin/bash
+# Script to massage domjudge problem.yaml files so they are suitable for pc2
+# Run this script from the config folder.  It will rename the ORIGINAL domjudge
+# problem.yaml in each folder to problem.yaml.orig, then create a new problem.yaml
+# suitable for pc2.  At least, that's the idea.
+# John Buck, Sept 19, 2022
+
+MULTIPLIER=1.0
+MEMLIMIT=2048
+# Where to find the fake validator we set in PC2 to copy the result XML.  This gets
+# copied into the output_validators/*/$COPY_XML_RESULT file
+COPY_XML_RESULT=copy_xml_result
+
+doCompile()
+{
+	src="$1"
+	basedir="$2"
+	libs=""
+	case "$src" in
+	*.cpp)	compcmd="g++ -std=gnu++17"
+		ext=.cpp
+		;;
+	*.c)	compcmd="gcc -x c -g -O2 -std=gnu17 -static"
+		libs="-lm"
+		ext=.c
+		;;
+	*.java)	compcmd="javac -encoding UTF-8 -sourcepath . -d ."
+		ext=.java
+		;;
+	esac
+
+	# break into components
+	vp=`basename  $src $ext`
+	vd=`dirname $src`
+	echo Problem $prob has an output validator at $src 1>&2
+	# Build it
+	# Java is special
+	if test "$ext" = ".java"
+	then
+		outfile="$vp".class
+		rm -f $outfile
+		echo $0: Executing: $compcmd "$vp$ext"
+		( cd "$vd"; $compcmd "$vp$ext" )
+	else
+		outfile="$vp"_out
+		rm -f $outfile
+		echo $0: Executing: $compcmd -o "$outfile" "$vp$ext $libs"
+		( cd "$vd"; $compcmd -o "$outfile" "$vp$ext" $libs )1>&2
+	fi
+	# Status indicates if output was produced
+	if test -s "$vd/$outfile"
+	then
+		outpath="${vd#$basedir/}/$outfile"
+		intval_outpath="${vd#$basedir/}/copy_xml_result"
+		return 0
+	else
+		outpath=""
+		intval_outpath=""
+		return 1
+	fi
+}
+
+if test ! -s problemset.yaml
+then
+	echo $0: Must run this from the config folder
+	exit 1
+fi
+# Fix problemset.yaml, see if we already did it, meaning, we saved the original problemset.yaml
+if ! grep "color:" problemset.yaml
+then
+	cp problemset.yaml problemset.yaml.orig
+	# array of 16 colors
+	color_array=("#9486EA" "#E93603" "#9B630C" "#ACBBB6" "#F0F000" "#95E3CB" "#EB7400" "#6478AF" "#FAAD96"
+		"#C4E01D" "#13A668" "#FAC6AC" "#808080" "#F0F0F0" "#F000F0" "#00F0F0")
+	# Find every line in problemset.yaml with "letter: X", and add a color: xxx and rgb: xxx after it
+	idx=0
+	for letter in A B C D E F G H I J K L M N O P
+	do
+		if ! grep -q "letter: $letter" problemset.yaml
+		then
+			echo $0: Problem $letter not found, end of problem list.
+			break
+		fi
+		sed -i -e "/letter: $letter/a\
+\ \ color: '${color_array[$idx]}'\n\
+  rgb: '${color_array[$idx]}'" problemset.yaml
+		idx=$((idx+1))
+	done
+fi
+# Go through each problem folder
+for prob in `grep short-name problemset.yaml | sed -e 's/.* //'`
+do
+	pyaml="$prob/problem.yaml"
+	
+	  # actual problem.yaml name
+	  # original problem.yaml from domjudge
+	  porigyaml="$prob/problem.yaml.orig"
+	  # first time running? then save original
+	  if test ! -s "$porigyaml"
+	  then
+	  	mv "$pyaml" "$porigyaml"
+	  fi
+	  cat "$porigyaml" > $pyaml
+	  echo "" >> $pyaml
+	  addline=""
+	  # If there is no timeout: entry, we have to add one
+	  if ! grep timeout: "$porigyaml" >/dev/null 2>&1
+	  then
+	  	# Add limits section, if necessary
+		if ! egrep "^limits:" $porigyaml >/dev/null 2>&1
+		then
+		  	echo limits: >> $pyaml
+	  	  	echo "  time_multiplier: $MULTIPLIER" >> $pyaml
+		  	echo "  memory: $MEMLIMIT" >> $pyaml
+		  	echo -n "  timeout: " >> $pyaml
+			if test -s $prob/.timelimit
+			then
+			  	cat $prob/.timelimit >> $pyaml
+			else
+				# ugh - it seems that 10 secs is the domjudge default
+				echo 10 >> $pyaml
+			fi
+			echo "" >> $pyaml
+		else
+			# Ugh, need to add timelimit after limits ilne
+			addline="timeout: "`cat $prob/.timelimit`
+		fi
+	  fi
+
+	  # If this problem uses a custom validator, then we need to add PC2 specific stuff
+	  # TODO: Deal with interactive custom validator???
+	  if grep "validation: custom" $porigyaml >/dev/null
+	  then
+		# Name of validator source; only handle c/c++/java right now; not kotlin. other's don't need compiling
+		vsrc=`find $prob/output_validators "(" -name '*.c' -o -name '*.cpp' -o -name '*.java' ")" -a -print`
+		if test -z "$vsrc"
+		then
+			echo "$0: Warning: No source C/C++/java file found in output_validators folders"
+		else 
+			set $vsrc
+			if test $# -eq 1
+			then
+				if doCompile $vsrc $prob/output_validators
+				then
+					# Add pc2 validator section
+					echo "validator:" >> $pyaml
+					if grep -q "validation: custom interactive" $porigyaml
+					then
+						if ! cp $COPY_XML_RESULT "$prob/output_validators/$intval_outpath"
+						then
+							echo "$0: Copy validator $COPY_XML_RESULT is not present"
+							exit 5
+						fi
+						echo "  validatorProg: '"$intval_outpath"'" >> $pyaml
+						echo "  validatorCmd: '{:validator} result-tmp.xml {:resfile}'" >> $pyaml
+						echo "  usingInternal: false" >> $pyaml
+						echo "  validatorOption: 0" >> $pyaml
+						echo "  use-internal-validator: false" >> $pyaml
+						echo "  use-clics-validator: false" >> $pyaml
+						echo "  use-custom-validator: true" >> $pyaml
+						echo "  use-clics-custom-validator-interface: false" >> $pyaml
+					else
+						echo "  validatorProg: '"$outpath"'" >> $pyaml
+						echo "  validatorCmd: '{:validator} {:infile} {:ansfile} {:feedbackdir}'" >> $pyaml
+						echo "  usingInternal: false" >> $pyaml
+						echo "  validatorOption: 0" >> $pyaml
+						echo "  use-internal-validator: false" >> $pyaml
+						echo "  use-clics-validator: false" >> $pyaml
+						echo "  use-custom-validator: true" >> $pyaml
+						echo "  use-clics-custom-validator-interface: true" >> $pyaml
+					fi
+				else
+					echo $0: Build of $vsrc has failed
+				fi
+			else
+				echo "$0: Notice: multiple source files found for problem $prob output validator - manual intervention required"
+			fi
+		fi
+          fi
+
+	if test -n "$addline"
+	then
+		sed "/^limits:/a\
+\ \ $addline\
+" <$pyaml >tmp
+		mv tmp $pyaml
+	fi
+done
+exit 0

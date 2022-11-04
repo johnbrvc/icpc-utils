@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+AddJSONItem()
+{
+	tool="$1"
+	ver="$2"
+	echo "    {"
+	echo '        "tool":"'"$tool"'"',
+	echo '        "version":"'"$ver"'"'
+	echo "    }$3"
+}
+
+echo '['
+for cmd in gcc g++ java javac pypy3
+do
+	verstr=`$cmd --version | head -1`
+	AddJSONItem $cmd "$verstr" ","
+done
+verstr=`kotlinc -version 2>&1 | sed -n -e 's/^info: //p'`
+AddJSONItem kotlinc "$verstr" ""
+echo ']'
+exit 0

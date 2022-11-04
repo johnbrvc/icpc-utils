@@ -1,0 +1,87 @@
+#!/bin/bash
+# Wrapper PC2 uses to execute a submission
+# This will determine if a problem is interactive or not.
+# If not interactive, it just does an "exec (args)" (IE passes it along and does nothing)
+# If interative, it calls intrunner to do the hard work.
+# The usage is:
+# pc2-exe-wrapper ${:problemletter} ${:problemshort} ${:infile} ${:ansfile} <rest of exe args>
+#
+
+# Set interactive problem letters here
+INTERACTIVE_PROBLEMS=AB
+
+# Problem package folder base.  This is used to lookup $PROBLEM_PACKAGE_BASE/${problemshort}/output_validators/*/*_out
+# All validators must be named xxx_out and live in a subdirectory of the output_validators directory.
+# Alternately, we could do a 'case' statement based on problem letter and set each validator
+# explicilty.
+PROBLEM_PACKAGE_BASE=/home/domjudge/ccsconfig-dhaka/contests/pretest/config
+SECRET_FOLDER=$PROBLEM_PACKAGE_BASE/$2/data/secret
+
+# Path to intrunner executable
+INTRUNNER=/home/domjudge/ccsconfig-dhaka/tools/interactive-problem-gny/intrunner
+
+# Name of debug log where this script will write what it is doing
+LOGDEBUG=dbg.log
+
+# Name of temporary result XML file - must match what is in the copy_xml_result script!
+RESULT_TMP=result-tmp.xml
+
+# Script starts here
+
+echo `date`: Args: "$*" >> $LOGDEBUG
+
+# Check arg count, we need at least the 4 interactive problem args, and one execute arg, eg. "a.out"
+# We COULD assume it is a non-interactive problem if $# is < 5, and just exec $* here, do we want to do that?
+if test $# -lt 5
+then
+	echo $0: Not enough arguments. | tee -a $LOGDEBUG
+	echo $0: Usage: "pc2-exe-wrapper \${:problemletter} \${:problemshort} \${:infile} \${:ansfile} <rest of exe args>" | tee -a $LOGDEBUG
+	exit 2
+fi
+
+# Get problem run info
+# Letter
+prob="$1"
+# Short name
+probshort="$2"
+# Judge's input file
+judgein="$SECRET_FOLDER/$3"
+# Judge's output file
+judgeans="$SECRET_FOLDER/$4"
+
+# See if this is an interactive problem
+if [[ "$INTERACTIVE_PROBLEMS" =~ "$prob" ]]
+then
+	# This is an interactive problem
+	# We have to set up for a call to intrunner
+	# But first we need to gather all the info we need.
+
+	# Determine location of validator
+	validator=`ls "$PROBLEM_PACKAGE_BASE"/"$probshort"/output_validators/*/*_out`
+	if test ! -x "$validator"
+	then
+	        echo $0: There is no output validator found on the path: "$validator" | tee -a $LOGDEBUG
+	        exit 6
+	fi
+	# We already sucked up the interactive validator options, so get rid of them and leave execute command from pc2
+	shift 4
+	mkdir -p feedback
+	rm -f $RESULT_TMP
+	echo `date`: Interactive problem: "$prob" - $probshort Input:"$judgein" Answer:"$judgeans" InteractiveValidator:"$validator" >> $LOGDEBUG
+	echo "              Execute: $*" >> $LOGDEBUG
+	exec $INTRUNNER "$validator" \
+		"$judgein" \
+		"$judgeans" \
+		feedback \
+		$RESULT_TMP \
+		$*
+	echo $0: Can not execute interactive judging for $INTRUNNER $validator $judgein $judgeans feedback $RESULT_TMP "$*" | tee -a $LOGDEBUG
+else
+	# This is a regular problem, strip off interactive validator args, since they don't apply, then just pass it off
+	shift 4
+	echo `date`: Non-interactive problem: "$prob" - $probshort Input:"$judgein" Answer:"$judgeans" >> $LOGDEBUG
+	echo "              Execute: $*" >> $LOGDEBUG
+	exec $*
+	echo $0: Can not execute "$*" | tee -a $LOGDEBUG
+fi
+exit 0

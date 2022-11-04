@@ -1,0 +1,13 @@
+set -v
+g++ -o paul paul.cpp
+g++ -o ludo ludo.cpp
+g++ -o benni benni.cpp
+gcc -o bergur bergur.c
+javac Bjarki.java
+javac BjarkiMaxQueries.java
+pypy3 -m py_compile jorke.py
+pypy3 -m py_compile pehrs.py
+pypy3 -m py_compile ragnar.py
+pypy3 -m py_compile reinier.py
+pypy3 -m py_compile tobi.py
+/usr/lib/kotlinc/bin/kotlinc paul.kt -include-runtime -d paul.jar
