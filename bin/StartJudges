@@ -1,0 +1,8 @@
+#!/bin/bash
+for judge in 1 2 3 4 5
+do
+	j=judge$judge
+	echo Starting $j
+	ssh $j@localhost ./StartJudge
+	sleep 1
+done

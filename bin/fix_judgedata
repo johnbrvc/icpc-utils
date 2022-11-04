@@ -1,8 +1,6 @@
 #!/bin/bash
 DEBUG=
 
-
-
 if test ! -s problemset.yaml
 then
 	echo $0: Must run this from the config folder
@@ -12,7 +10,7 @@ PC2CONFIG=`pwd`
 # Go through each problem folder
 for prob in `grep short-name problemset.yaml | sed -e 's/.* //'`
 do
-	if ! cd $PC2CONFIG/$prob/data/secret
+	if ! cd $PC2CONFIG/$prob/data
 	then
 		echo $0: no data folder for problem $prob
 	else
@@ -20,11 +18,18 @@ do
 		samps=`ls sample__* secret__* 2>/dev/null`
 		if test -z "$samps"
 		then
-			echo $0: Renaming judge secret data files to secret__xxx
-			for file in *.in *.ans
-			do
-				$DEBUG mv $file secret__$file
-			done
+			if cd secret
+			then
+				echo $0: Renaming judge secret data files to secret__xxx
+				for file in *.in *.ans
+				do
+					$DEBUG mv $file secret__$file
+				done
+			else
+				echo $0: There is no secret data folder for problem $prob
+				mkdir secret
+				cd secret
+			fi
 			if cd ../sample
 			then
 				echo $0: Copying sample data to secret/sample__xxx for problem $prob

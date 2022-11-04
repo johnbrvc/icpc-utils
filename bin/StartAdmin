@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $HOME/pc2
+pc2admin --login a1 >alog 2>&1 &
+

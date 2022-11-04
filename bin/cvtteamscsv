@@ -14,7 +14,7 @@ echo -e "site\taccount\texternalid\tdisplayname\tpermdisplay\talias" > load_team
 #1<tab>133344<tab>13337<tab>Prodrive Technologies 1<tab>Prodrive Technologies<tab>Prodrive<tab>NLD<tab>INST-37010
 #2<tab>739248<tab>367<tab>Segfault go BRRRR<tab>Delft University of Technology<tab>TU Delft<tab>NLD<tab>INST-0367
 #3<tab>742648<tab>452<tab>π ece of 🍰<tab>Eindhoven University of Technology<tab>TU/e<tab>NLD<tab>INST-0452
-sed -n -e 1d -e 's/\([0-9][0-9]*\)	\([0-9][0-9]*\)	[0-9][0-9]*	\([^	][^	]*\)	.*/1	team\1	\2	\3	true	/p' < $1 | \
+sed -n -e 1d -e 's/\([0-9][0-9]*\)	\([0-9][0-9]*\)	[0-9][0-9]*	[^	][^	]*	\([^	][^	]*\)	.*/1	team\1	\2	\3	true	/p' < $1 | \
 	sort -V >> load_teams.tsv
 
 # this is for the one from the CMS (icpc.global) - no good since no team numbers!

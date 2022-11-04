@@ -20,6 +20,9 @@ doCompile()
 	*.cpp)	compcmd="g++ -std=gnu++17"
 		ext=.cpp
 		;;
+	*.cc)	compcmd="g++ -std=gnu++17"
+		ext=.cc
+		;;
 	*.c)	compcmd="gcc -x c -g -O2 -std=gnu17 -static"
 		libs="-lm"
 		ext=.c
@@ -66,7 +69,7 @@ then
 	exit 1
 fi
 # Fix problemset.yaml, see if we already did it, meaning, we saved the original problemset.yaml
-if ! grep "color:" problemset.yaml
+if ! grep "color:" problemset.yaml >/dev/null
 then
 	cp problemset.yaml problemset.yaml.orig
 	# array of 16 colors
@@ -132,7 +135,7 @@ do
 	  if grep "validation: custom" $porigyaml >/dev/null
 	  then
 		# Name of validator source; only handle c/c++/java right now; not kotlin. other's don't need compiling
-		vsrc=`find $prob/output_validators "(" -name '*.c' -o -name '*.cpp' -o -name '*.java' ")" -a -print`
+		vsrc=`find $prob/output_validators "(" -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cc' ")" -a -print`
 		if test -z "$vsrc"
 		then
 			echo "$0: Warning: No source C/C++/java file found in output_validators folders"
