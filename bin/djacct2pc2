@@ -7,6 +7,7 @@ then
 	exit 2
 fi
 ACCTFILE=accounts.tsv
+PC2ACCTFILE=accounts_load.tsv
 TEAMS2_FILE=teams2.tsv
 
 if test ! -s "$ACCTFILE"
@@ -16,7 +17,7 @@ then
 fi
 
 # Header
-echo "site	account	externalid	displayname	permdisplay	alias"
+echo "site	account	externalid	displayname	permdisplay	alias" > $PC2ACCTFILE
 # First, teams:
 #team\tAdama Science and Technology University\tteam1\treps-math-sprung-arrive
 #team\tAin Shams University - Faculty of Computer and Information Sciences\tteam2\tclip-draw-deny-timing
@@ -40,7 +41,7 @@ egrep "^team	" < $ACCTFILE | \
 			exit 4
 		fi
 		echo "1	team$teamnum	$icpcid	$schoolname	true	"
-	done
+	done >> $PC2ACCTFILE
 
 
 # Next:
@@ -57,5 +58,5 @@ egrep "^(judge|admin)	" < $ACCTFILE | sed -n -e 's/^[a-z][a-z]*	//' -e 's/\([^	]
 		echo "1	team$lastjudge	$icpcid	$fullname	false	$alias"
 		lastjudge=$((lastjudge-1))
 		icpcid=$((icpcid+1))
-	done
+	done >> $PC2ACCTFILE
 exit 0
