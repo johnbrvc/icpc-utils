@@ -125,8 +125,16 @@ do
 			fi
 			echo "" >> $pyaml
 		else
-			# Ugh, need to add timelimit after limits ilne
-			addline="timeout: "`cat $prob/.timelimit`
+			# Ugh, need to add timelimit after limits line, also need to figure out how many spaces
+			# for yaml, since they use different numbers of spaces, ugh again.
+			spaces=`grep "time_multiplier:" $porigyaml  | sed -e 's/time_multiplier.*//'`
+			if test -z "$spaces"
+			then
+				# No multiplier, so just use 2 spaces; it will barf when being loaded if bad
+				echo $0: Whoops! no time multiplier to figure out yaml indenting - please check $porigyaml
+				spaces="  "
+			fi
+			addline="$spaces""timeout: "`cat $prob/.timelimit`
 		fi
 	  fi
 
@@ -180,11 +188,12 @@ do
 			fi
 		fi
           fi
-
 	if test -n "$addline"
 	then
+		# spaces need to be escaped for here doc and sed
+		al=`echo "$addline" | sed -e 's/ /\\\\ /g'`
 		sed "/^limits:/a\
-\ \ $addline\
+$al\
 " <$pyaml >tmp
 		mv tmp $pyaml
 	fi

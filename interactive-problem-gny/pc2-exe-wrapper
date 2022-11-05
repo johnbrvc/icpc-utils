@@ -7,18 +7,18 @@
 # pc2-exe-wrapper ${:problemletter} ${:problemshort} ${:infile} ${:ansfile} <rest of exe args>
 #
 
-# Set interactive problem letters here
-INTERACTIVE_PROBLEMS=AB
+# Set interactive problem letters here - replace X with problem list, eg BCE
+INTERACTIVE_PROBLEMS=X
 
 # Problem package folder base.  This is used to lookup $PROBLEM_PACKAGE_BASE/${problemshort}/output_validators/*/*_out
 # All validators must be named xxx_out and live in a subdirectory of the output_validators directory.
 # Alternately, we could do a 'case' statement based on problem letter and set each validator
 # explicilty.
-PROBLEM_PACKAGE_BASE=/home/domjudge/ccsconfig-dhaka/contests/pretest/config
+PROBLEM_PACKAGE_BASE=$HOME/pc2/current/config
 SECRET_FOLDER=$PROBLEM_PACKAGE_BASE/$2/data/secret
 
 # Path to intrunner executable
-INTRUNNER=/home/domjudge/ccsconfig-dhaka/tools/interactive-problem-gny/intrunner
+INTRUNNER=$PROBLEM_PACKAGE_BASE/intrunner
 
 # Name of debug log where this script will write what it is doing
 LOGDEBUG=dbg.log
