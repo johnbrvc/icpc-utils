@@ -1,0 +1,32 @@
+#!/bin/bash
+if test $# -ne 2
+then
+	echo Usage: $0 pc2results.tsv domresults.tsv
+	exit 1
+fi
+pc2=$1
+dom=$2
+makesortedresults()
+{
+	inf=$1
+	outf=$2
+	stripjudge=$3
+	if test $stripjudge -eq 1
+	then
+		egrep -v "^999[0-9][0-9][0-9]" < $inf > $inf.nojudge
+		inf=$inf.nojudge
+	fi
+		
+	egrep "^[0-9][0-9]*		" <$inf > $inf.hon
+	egrep -v "^[0-9][0-9]*		" <$inf > $inf.rank
+	sort -k 2n -k 4rn -k 5n -k 6n -k 1rn <$inf.rank > $outf
+	sort -k 3rn -k 4n -k 5n -k 1rn <$inf.hon >> $outf
+}
+makesortedresults $pc2 pc2sorted 1
+makesortedresults $dom domsorted 0
+diff pc2sorted domsorted > results.diff
+res=$?
+
+# rm -f $pc2.nojudge $pc2.hon $pc2.rank
+# rm -f pc2sorted domsorted 
+exit $res
