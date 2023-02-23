@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $HOME/pc2
+pc2board --login b1 >jlog 2>&1 &
+

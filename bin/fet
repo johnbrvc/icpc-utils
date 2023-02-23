@@ -1,0 +1,13 @@
+#!/bin/bash
+TEAM_LOGINS=/root/team_logins.tsv
+TEAM_IPS=/root/team_ipaddr.tsv
+args="$*"
+while read team ip
+do
+	if [[ "$team" =~ team[0-9][0-9]* ]]
+	then
+		echo '***************' $team '@' $ip '******************'
+		ssh -4 root@$ip $args 
+	fi
+done < $TEAM_IPS
+

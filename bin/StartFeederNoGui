@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $HOME
+nohup pc2ef --nogui --login feeder1 >elog 2>&1 &
+
