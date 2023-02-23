@@ -1,0 +1,42 @@
+#!/bin/bash
+PROBBAK=problems.bak
+# Location where the CDP is
+REPODIR=~/repos/GNY2022/real22
+PROBZIP=GNYProblems.zip
+PNAMES=$REPODIR/config/pnames
+WTIDIR=~/WebTeamInterface-1.1/WebContent/WTI-UI/problems
+ERRATA=ProblemStatementAdditions.pdf
+
+cd  $WTIDIR
+if test -d $PROBBAK
+then
+	echo $0: $PROBBAK already exists from a previous run.  Either move it or remove it.
+	exit 1
+fi
+mv problems $PROBBAK
+mkdir problems
+cd problems
+probs=`ls $REPODIR/web_problem_set`
+for prob in $probs
+do
+	if [[ $prob == [A-Z]-* ]]
+	then
+		letter=${prob:0:1}
+		set `grep -G "^$letter " $PNAMES`
+		let=$1
+		short=$2
+		long="$3"
+		subdir=${prob%.pdf}
+#		echo  Letter:$let ShortName:$short LongName:$long subdir:$subdir
+		mkdir $subdir $subdir/sample
+		# copy in pdf
+		cp $REPODIR/web_problem_set/$prob $subdir
+		# copy in sample data
+		cp $REPODIR/config/$short/data/sample/* $subdir/sample
+		fromdos $subdir/sample/*
+	fi
+done
+cp $REPODIR/web_problem_set/$ERRATA .
+rm -f ../$PROBZIP
+zip -r ../$PROBZIP *
+
