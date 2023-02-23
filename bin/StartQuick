@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+#  Purpose: to run QuickJudge
+#
+# Sun Feb 19 18:10:02 PDT 2023
+
+# pc2qj.bat --login a12
+cd ~/pc2
+java -Djdk.crypto.KeyAgreement.legacyKDF=true  -jar QuickJudge.jar --ui edu.csus.ecs.pc2.ui.admin.ReportsViewQ $*
+
