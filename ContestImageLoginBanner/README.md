@@ -3,15 +3,23 @@ https://help.gnome.org/admin/system-admin-guide/stable/login-banner.html.en
 But in a nutshell:
 
 Network address changes service
+
 /etc/systemd/system/icpc_updatebanner.service
+
 Executes /home/pc2/update-banner shell script
+
 Runs every 30 seconds
+
 Enumerates all network interfaces
+
 If network changes, updates /etc/dconf/db/gdm.d/01-banner-message
 
 [org/gnome/login-screen]
+
 banner-message-enable=true
+
 banner-message-text='message text\ngoes here\nline3.
+
 
 The banner messages are displayed on the login screen as lines of text.
 https://photos.app.goo.gl/PVyZGaFdcxcZy63f7
