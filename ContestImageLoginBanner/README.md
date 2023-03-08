@@ -17,9 +17,13 @@ The banner messages are displayed on the login screen as lines of text.
 https://photos.app.goo.gl/PVyZGaFdcxcZy63f7
 
 Needed to create /etc/dconf/profile/gdm:
+
 user-db:user
+
 system-db:gdm
+
 file-db:/usr/share/gdm/greeter-dconf-defaults
+
 
 Create gdm keyfile /etc/dconf/db/gdm.d/01-banner-message as above
 
