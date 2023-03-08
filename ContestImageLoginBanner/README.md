@@ -1,5 +1,8 @@
 This page was helpful:
 https://help.gnome.org/admin/system-admin-guide/stable/login-banner.html.en
+
+Also, item 23 here: https://docs.google.com/document/d/19IjeBZcUVhMpqgsFWErhyQ_jWeLiBaFbSHkI8zYJozM/edit?usp=sharing
+
 But in a nutshell:
 
 Network address changes service
