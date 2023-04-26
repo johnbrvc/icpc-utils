@@ -1,0 +1,25 @@
+#!/bin/bash
+DEBUG=
+
+if test ! -s problemset.yaml
+then
+	echo $0: Must run this from the config folder
+	exit 1
+fi
+PC2CONFIG=`pwd`
+# Go through each problem folder
+for prob in `grep short-name problemset.yaml | sed -e 's/.* //'`
+do
+	if ! cd $PC2CONFIG/$prob
+	then
+		echo $0: no data folder for problem $prob
+	else
+		# see if we did this already
+		if ! grep -q sandbox-type problem.yaml
+		then
+			sed -i.bak -e '/limits:/i sandbox-type: PC2_INTERNAL_SANDBOX\n' -e '/timeout:/a \ \ memory: 2048' problem.yaml
+		fi
+		cd $PC2CONFIG
+	fi
+done
+exit 0
