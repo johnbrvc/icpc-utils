@@ -1,0 +1,136 @@
+#!/bin/bash
+# John Buck, February 2022 GNY
+#
+# This script is typically run by a system service at system startup (see icpc_updatebanner.service)
+# 
+# The purpose of this script is to periodically check all network interfaces for changes in IP address.
+# It gets each interface using the "ip" command, looks up its MAC address in the /sys/class/net filesystem
+# and creates a multi-line string consisting of the interface name, IP, GW and MAC for possible display
+# on the GDM login screen.  eg
+#
+# Interface: eno1
+# IP: 10.0.0.106
+# GW: 10.0.0.3
+# MAC: 12:34:45:67:78:90
+#
+# If there are multiple interfaces with valid IP addresses, it concatenates them all together.
+# It also looks up the IP address of the "pc2server" host using 'getent', for display on the login screen as well.
+# If any changes at all are detected from the previous message displayed, the gdm banner message file
+# is updated, and the gdm dconf database is updated.  This causes it to change on the GDM login screen.
+#
+# In addition, for each ip address change, a simple message of the form:  "MAC IP GW NERR" is sent to
+# port 80 ($NETINFO_PORT) on the pc2server machine.  Port 80 is NOT a web server(!) since pc2server does not have a web
+# server running on that port.  Basically a "nc" server is sitting there reading any traffic on port 80
+# and saving the info to a file.  This way, we can maintain a list of all clients that have booted up, along
+# with their IP addresses (for ansible, for example).  A different port may be used by change NETINFO_PORT.
+# The call to sendnetinfo may be commented out if this functionality is not desired.
+
+# File containing the message to display on the login screen
+DBFILE="/etc/dconf/db/gdm.d/01-banner-message"
+
+# Port number to send network information to on the pc2server
+NETINFO_PORT=80
+
+# How often to check network interfaces for changes
+FREQUENCY=30
+
+# Hack option to not loop and just run it once (testing?)
+arg="$1"
+oneshot=0
+case "$arg" in
+-o*) oneshot=1 ;;
+esac
+
+# Array of hosts network info
+declare -a hostinfo
+ncerr=0
+servererrs=0
+
+#
+# Sends a hosts network information off to the pc2server for record keeping
+#
+sendnetinfo()
+{
+	i=0
+	while test $i -lt "$idx"
+	do
+#		echo Trying to send ${hostinfo[$i]}
+		echo ${hostinfo[$i]} $servererrs | nc -w 5 -N pc2server $NETINFO_PORT 
+		ncerr=$?
+#		echo Returns $ncerr
+		i=$((i+1))
+		if test "$ncerr" != "0"
+		then
+			servererrs=$((servererrs+1))
+		else
+			servererrs=0
+		fi
+	done
+}
+
+# Spins forever
+while true
+do
+	msg=""
+	idx=0
+	# Read input of "ip" command.  Use '<<<' operator since piping causes a new fork and
+	# we loose shell variables.  This loop just concatenates each interface's information into
+	# a single big, multi-line string
+	while read ifc state info
+	do
+		mac=`cat /sys/class/net/$ifc/address`
+		gw=`ip r | grep default | grep $ifc | sed -e 's/default via  *//' -e 's/ dev .*//'`
+		msg="${msg}Interface: $ifc\nIP: $info\nGW: $gw\nMAC: $mac\n\n"
+		hostinfo[$idx]="$mac $info $gw"
+#		echo ${hostinfo[$idx]}
+		idx=$((idx+1))
+	done <<< "$(ip -4 --brief addr | grep -G '[[:space:]]UP[[:space:]]')"
+	if test -z "$msg"
+	then
+		msg="No network information available\n\n"
+	fi
+	serveraddr=`getent hosts pc2server`
+	# Add the pc2server address to the message
+	msg="${msg}pc2server: ${serveraddr%% *}"
+	# Let them know if any attempts to send to pc2server have failed (maybe no IP address yet)
+	if test "$servererrs" != "0"
+	then
+	       	msg="${msg} Errors:$servererrs"
+	fi
+	# If any network info has changed, we have to update the login banner message
+	if test "$msg" != "$prevmsg"
+	then
+		# First, send network info off to the pc2server.   Comment this out if you dont want this
+		# functionality.
+		sendnetinfo
+
+		prevmsg="$msg"
+		# Create new banner message file (it can be multiline with embedded \n)
+		(
+			msg=${msg}"\n\nUpdated: "`date`"\n"
+			echo '[org/gnome/login-screen]'
+			echo 'banner-message-enable=true'
+			echo "banner-message-text='$msg'"
+		) > $DBFILE
+		# Generate new database so GDM will udpate
+		dconf update
+#No need to bounce GDM login, it checks by itself
+#		# Look for ":1" etc in who line, meaning someone is logged in
+#		gui=`who | grep -G "[[:space:]]:[[:digit:]]" | sed -e 's/[ 	].*//'`
+#		if test -z "$gui"
+#		then
+#			systemctl restart gdm3
+#		fi
+	elif test "$ncerr" != "0"
+	then
+		# Notify server on network error (can comment this out too)
+		sendnetinfo
+
+	fi
+	if test "$oneshot" = "1"
+	then
+		break
+	fi
+	sleep $FREQUENCY
+done
+exit 0

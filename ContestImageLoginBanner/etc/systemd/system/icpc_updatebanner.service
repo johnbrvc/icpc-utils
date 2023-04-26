@@ -1,0 +1,9 @@
+[Unit]
+Description=Update GDM3 login screen with network information
+
+[Service]
+Type=simple
+ExecStart=/home/pc2/update-banner
+
+[Install]
+WantedBy=multi-user.target
