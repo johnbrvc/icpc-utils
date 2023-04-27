@@ -1,8 +1,8 @@
 #!/bin/bash
 for judge in 1 2 3 4 5
 do
-	j=judge$judge
-	echo Stopping $j
-	ssh $j@localhost ./StopJudge
+	j=ubuntu@pc2judge$judge.icpc-vcss.org
+	echo Stopping judge $judge on $j
+	ssh $j ./StopJudge.sh
 	sleep 1
 done

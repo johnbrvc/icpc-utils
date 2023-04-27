@@ -1,0 +1,9 @@
+#!/bin/bash
+args="$*"
+for j in 1 2 3 4 5
+do
+	host="root@pc2judge$j.icpc-vcss.org"
+	echo '***************' Judge $j '******************'
+	ssh -4 $host $args 
+done
+
