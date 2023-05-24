@@ -17,18 +17,21 @@ doCompile()
 	basedir="$2"
 	libs=""
 	case "$src" in
-	*.cpp)	compcmd="g++ -std=gnu++17"
+	*.cpp)	compcmd="g++ -std=gnu++20"
 		ext=.cpp
 		;;
-	*.cc)	compcmd="g++ -std=gnu++17"
+	*.cc)	compcmd="g++ -std=gnu++20"
 		ext=.cc
 		;;
-	*.c)	compcmd="gcc -x c -g -O2 -std=gnu17 -static"
+	*.c)	compcmd="gcc -x c -g -O2 -std=gnu11 -static"
 		libs="-lm"
 		ext=.c
 		;;
 	*.java)	compcmd="javac -encoding UTF-8 -sourcepath . -d ."
 		ext=.java
+		;;
+	*.py)   compcmd="compilepython3"
+		ext=.py
 		;;
 	esac
 
@@ -44,6 +47,11 @@ doCompile()
 		rm -f $outfile
 		echo $0: Executing: $compcmd "$vp$ext"
 		( cd "$vd"; $compcmd "$vp$ext" )
+	elif test "$ext" = ".py"
+	then
+		outfile=""
+		echo $0: Executing : $compcmd "$vp$ext"
+		(cd "$vd"; $compcmd "$vp$ext" )
 	else
 		outfile="$vp"_out
 		rm -f $outfile
@@ -51,15 +59,21 @@ doCompile()
 		( cd "$vd"; $compcmd -o "$outfile" "$vp$ext" $libs )1>&2
 	fi
 	# Status indicates if output was produced
-	if test -s "$vd/$outfile"
+	if test "$ext" != ".py"
 	then
-		outpath="${vd#$basedir/}/$outfile"
-		intval_outpath="${vd#$basedir/}/copy_xml_result"
-		return 0
+		if test -s "$vd/$outfile"
+		then
+			outpath="${vd#$basedir/}/$outfile"
+			intval_outpath="${vd#$basedir/}/copy_xml_result"
+			return 0
+		else
+			outpath=""
+			intval_outpath=""
+			return 1
+		fi
 	else
-		outpath=""
-		intval_outpath=""
-		return 1
+		outpath="${vd#$basedir/}/$vp$ext"
+		return 0
 	fi
 }
 
@@ -143,7 +157,7 @@ do
 	  if grep "validation: custom" $porigyaml >/dev/null
 	  then
 		# Name of validator source; only handle c/c++/java right now; not kotlin. other's don't need compiling
-		vsrc=`find $prob/output_validators "(" -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cc' ")" -a -print`
+		vsrc=`find $prob/output_validators "(" -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cc' -o -name '*.py' ")" -a -print`
 		if test -z "$vsrc"
 		then
 			echo "$0: Warning: No source C/C++/java file found in output_validators folders"
