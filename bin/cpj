@@ -14,5 +14,5 @@ dst=$2
 for j in 1 2 3 4 5
 do
 	echo Copying "$src" to "$JUDGE_USER@pc2judge$j$URLBASE:$dst"
-	scp -p "$src" "$JUDGE_USER#pc2judge$j$URLBASE:$dst"
+	scp -p "$src" "$JUDGE_USER@pc2judge$j$URLBASE:$dst"
 done
