@@ -1,0 +1,12 @@
+#!/bin/bash
+machines="3 4 5"
+#machines="2"
+for file in $machines
+do
+	host=pc2judge$file.icpc-vcss.org
+	echo Updating grub on $host
+	scp -p /etc/default/grub root@$host:/etc/default/grub
+	scp -p /etc/default/grub.d/50-cloudimg-settings.cfg root@$host:/etc/default/grub.d/50-cloudimg-settings.cfg
+	ssh root@$host update-grub
+	ssh root@$host reboot
+done

@@ -1,0 +1,21 @@
+#!/bin/bash
+JUDGEUSER=icpc
+#JUDGEUSER=ubuntu
+URLBASE=
+#URLBASE=.icpc-vcss.org
+if test $# -gt 0
+then
+	args="$*"
+else
+	args="1 2 3 4 5"
+fi
+cd $HOME
+for j in $args
+do
+	cmd="rsync -avz pc2 $JUDGEUSER@pc2judge$j$URLBASE:."
+	echo Executing: "$cmd"
+	$cmd
+	cmd="rsync -avz pc2/remote/pc2v9.ini $JUDGEUSER@pc2judge$j$URLBASE:./pc2v9.ini"
+	echo Executing: "$cmd"
+	$cmd
+done

@@ -1,0 +1,9 @@
+#!/bin/bash
+for p in 1 2 3 4
+do
+	sed -i -e 's/problemnamepart/problemname/' -e 's/}{[0-9]: / - /' sreioc$p/problem_statement/problem.tex
+done
+for p in 2 3
+do
+	cp sreioc$p/output_validators/*/*.jar sreioc$p/output_validators
+done
