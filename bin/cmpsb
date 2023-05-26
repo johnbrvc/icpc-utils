@@ -1,0 +1,8 @@
+#!/bin/bash
+djfile=domjudge/scoreboard.json
+pc2file=pc2/scoreboard.json
+egrep "rank|num_solved|total_time" $djfile > dj
+json_pp < $pc2file | egrep "rank|num_solved|total_time" > pc
+diff -w dj pc
+rm dj pc
+
