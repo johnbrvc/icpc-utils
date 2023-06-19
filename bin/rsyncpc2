@@ -1,0 +1,15 @@
+#!/bin/bash
+URLBASE=
+#URLBASE=.icpc-vcss.org
+if test $# -gt 0
+then 
+	args="$*"
+else
+	args="1 2 3 4 5"
+fi
+for j in $args
+do
+	cmd="rsync -avz /usr/pc2/ root@pc2judge$j$URLBASE:/usr/pc2"
+	echo Executing: "$cmd"
+	$cmd
+done

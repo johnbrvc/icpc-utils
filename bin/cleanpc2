@@ -1,0 +1,3 @@
+#!/bin/bash
+cd ~/pc2
+rm -rf logs/* ?log execute* profiles*

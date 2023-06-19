@@ -1,8 +1,10 @@
 #!/bin/bash
+URLBASE=
+#URLBASE=.icpc-css.org
 args="$*"
 for j in 1 2 3 4 5
 do
-	host="root@pc2judge$j.icpc-vcss.org"
+	host="root@pc2judge$j$URLBASE"
 	echo '***************' ROOT Judge $j '******************'
 	ssh -4 $host $args 
 done
