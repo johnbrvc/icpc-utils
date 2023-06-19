@@ -1,0 +1,17 @@
+#!/bin/bash
+n=1
+for file in accessdenied/data/secret/*.in
+do
+	of=`echo "$file" | sed -e 's/.in$/.ans/'`
+	./pc2sandbox_interactive.sh 64 2 accessdenied/output_validators/validate/validate_out \
+		$file $of \
+		$n \
+		./a 
+
+	if ! grep -i accepted tmp_results.xml >/dev/null
+	then
+		echo $file
+		cat tmp_results.xml
+	fi
+	n=$((n+1))
+done

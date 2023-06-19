@@ -1,0 +1,14 @@
+#!/bin/bash
+for file in accessdenied/data/secret/*.in
+do
+	of=`echo "$file" | sed -e 's/.in$/.ans/'`
+	./intrunner.sh accessdenied/output_validators/validate/validate_out \
+		$file $of \
+		feedback \
+		res333.xml ./w  2>err
+	if ! grep -i accepted res333.xml >/dev/null
+	then
+		echo $file
+		cat res333.xml
+	fi
+done

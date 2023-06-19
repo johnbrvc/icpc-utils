@@ -1,0 +1,7 @@
+Running: accessdenied/output_validators/validate/validate_out accessdenied/data/secret/secret__91-all_chars_4.in accessdenied/data/secret/secret__91-all_chars_4.ans feedback < fout >fin &
+Validator pid 75003
+Running: ./w  >fout  <fin &
+Contestant pid 75004
+Contestant finished status 0
+Validator finishes status 42
+All done

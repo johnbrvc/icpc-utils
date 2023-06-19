@@ -1,5 +1,5 @@
 #!/bin/bash
-./intrunner accessdenied/output_validators/validate/validate_out \
+./intrunner.sh accessdenied/output_validators/validate/validate_out \
 	accessdenied/data/secret/secret__88-all_chars_1.in \
 	accessdenied/data/secret/secret__88-all_chars_1.ans \
 	feedback \
