@@ -67,6 +67,7 @@ EXITCODE_WA=43
 # Where the interim results are saved
 TMP_FEEDBACKDIR=tmp_feedback
 TMP_RESULTFILE=tmp_results.xml
+feedbackfile=${TMP_FEEDBACKDIR}/judgemessage.txt
 
 # We put reports of each testcase in this folder
 REPORTDIR=reports
