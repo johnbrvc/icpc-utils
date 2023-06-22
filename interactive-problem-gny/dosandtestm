@@ -4,4 +4,4 @@
 	accessdenied/data/secret/secret__88-all_chars_1.ans \
 	1 \
 	./m 
-cat tmp_results.xml
+cat interactive_results.xml

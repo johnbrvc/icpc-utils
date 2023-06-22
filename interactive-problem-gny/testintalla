@@ -3,7 +3,7 @@ n=1
 for file in accessdenied/data/secret/*.in
 do
 	of=`echo "$file" | sed -e 's/.in$/.ans/'`
-	./pc2sandbox_interactive.sh 64 2 accessdenied/output_validators/validate/validate_out \
+	./pc2_interactive.sh accessdenied/output_validators/validate/validate_out \
 		$file $of \
 		$n \
 		./a 

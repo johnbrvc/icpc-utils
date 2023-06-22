@@ -8,10 +8,10 @@ do
 		$n \
 		./w 
 
-	if ! grep -i accepted tmp_results.xml >/dev/null
+	if ! grep -i accepted interactive_results.xml >/dev/null
 	then
 		echo $file
-		cat tmp_results.xml
+		cat interactive_results.xml
 	fi
 	n=$((n+1))
 done
