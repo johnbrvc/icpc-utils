@@ -1,0 +1,18 @@
+#!/bin/bash
+if test $# -ne 2
+then
+	echo Usage: $0 teams.json organizations.json '> teams2.tsv'
+	exit 1
+fi
+teamsjs="$1"
+orgsjs="$2"
+# Get organizations
+for org in `jq -r '.[] | "\(.organization_id)"' < $teamsjs`
+do
+	grep '"id":"'"$org"'"' < $orgsjs | sed -e 's/,$//' -e 's/[][]//' | \
+	jq -r '. | "\(.name)\t\(.country)\tINST-U-\(.icpc_id)"'
+done >.tmp1
+echo -e "File_Version\t1\r"
+jq -r '.[] | "\(.id)\t\(.icpc_id)\t\(.group_ids[0])\t\(.name)\t\(.display_name)"' < $teamsjs | \
+	paste - .tmp1 | sed -e 's/$/\r'/
+rm -f .tmp1
