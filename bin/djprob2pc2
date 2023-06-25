@@ -146,7 +146,8 @@ do
 		else
 			# Ugh, need to add timelimit after limits line, also need to figure out how many spaces
 			# for yaml, since they use different numbers of spaces, ugh again.
-			spaces=`grep "time_multiplier:" $porigyaml  | sed -e 's/time_multiplier.*//'`
+			spaces=`sed -n -e '/^limits:/{n;s/\([ ][ ]*\).*/\1/p;}' < $porigyaml`
+#			spaces=`grep "time_multiplier:" $porigyaml  | sed -e 's/time_multiplier.*//'`
 			if test -z "$spaces"
 			then
 				# No multiplier, so just use 2 spaces; it will barf when being loaded if bad
@@ -158,7 +159,6 @@ do
 	  fi
 
 	  # If this problem uses a custom validator, then we need to add PC2 specific stuff
-	  # TODO: Deal with interactive custom validator???
 	  if grep "validation: custom" $porigyaml >/dev/null
 	  then
 		# Name of validator source; only handle c/c++/java right now; not kotlin. other's don't need compiling
@@ -176,18 +176,17 @@ do
 					echo "validator:" >> $pyaml
 					if grep -q "validation: custom interactive" $porigyaml
 					then
-#						if ! cp $COPY_XML_RESULT "$prob/output_validators/$intval_outpath"
-#						then
-#							echo "$0: Copy validator $COPY_XML_RESULT is not present"
-#							exit 5
-#						fi
+						# For interactive validator, command line just has validator name.
+						# The rest is filled in by the pc2*_interactive.sh script(s)
 						echo "  validatorProg: '"$intval_outpath"'" >> $pyaml
-						echo "  validatorCmd: '{:validator} result-tmp.xml {:resfile}'" >> $pyaml
+						echo "  validatorCmd: '{:validator}'" >> $pyaml
 						echo "  usingInternal: false" >> $pyaml
 						echo "  validatorOption: 0" >> $pyaml
 						echo "  use-internal-validator: false" >> $pyaml
 						echo "  use-clics-validator: false" >> $pyaml
 						echo "  use-custom-validator: true" >> $pyaml
+						# This is for the post-interactive validator, not validatorProg!
+						# validatorProg is always CLICS.
 						echo "  use-clics-custom-validator-interface: false" >> $pyaml
 					else
 						echo "  validatorProg: '"$outpath"'" >> $pyaml
