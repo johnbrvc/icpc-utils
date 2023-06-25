@@ -1,7 +1,7 @@
 #!/bin/bash
 if test $# -ne 1
 then
-	echo Usage: $0 organizations.json '> institutions.tsv'
+	echo Usage: $0 organizations.json '> institutions.tsv' 1>&2
 	exit 1
 fi 
 orgsjs="$1"

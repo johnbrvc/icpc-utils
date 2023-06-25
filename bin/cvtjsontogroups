@@ -1,0 +1,10 @@
+#!/bin/bash
+if test $# -ne 1
+then
+	echo Usage: $0 groups.json '> groups.tsv' 1>&2
+	exit 1
+fi
+groupsjs="$1"
+echo -e "File_Version\t1\r"
+jq -r '.[] | "\(.id)\t\(.name)"' < $groupsjs | \
+	sed -e 's/$/\r'/

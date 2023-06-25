@@ -1,7 +1,7 @@
 #!/bin/bash
 if test $# -ne 2
 then
-	echo Usage: $0 teams.json organizations.json '> teams2.tsv'
+	echo Usage: $0 teams.json organizations.json '> teams2.tsv' 1>&2
 	exit 1
 fi
 teamsjs="$1"

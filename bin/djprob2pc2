@@ -98,6 +98,11 @@ then
 			echo $0: Problem $letter not found, end of problem list.
 			break
 		fi
+		# If color there already, dont add one
+		if grep -q "color:" problemset.yaml
+		then
+			continue
+		fi
 		sed -i -e "/letter: $letter/a\
 \ \ color: '${color_array[$idx]}'\n\
   rgb: '${color_array[$idx]}'" problemset.yaml
@@ -171,11 +176,11 @@ do
 					echo "validator:" >> $pyaml
 					if grep -q "validation: custom interactive" $porigyaml
 					then
-						if ! cp $COPY_XML_RESULT "$prob/output_validators/$intval_outpath"
-						then
-							echo "$0: Copy validator $COPY_XML_RESULT is not present"
-							exit 5
-						fi
+#						if ! cp $COPY_XML_RESULT "$prob/output_validators/$intval_outpath"
+#						then
+#							echo "$0: Copy validator $COPY_XML_RESULT is not present"
+#							exit 5
+#						fi
 						echo "  validatorProg: '"$intval_outpath"'" >> $pyaml
 						echo "  validatorCmd: '{:validator} result-tmp.xml {:resfile}'" >> $pyaml
 						echo "  usingInternal: false" >> $pyaml
