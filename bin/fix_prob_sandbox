@@ -15,17 +15,17 @@ do
 		echo $0: no data folder for problem $prob
 	else
 		# see if we did this already
-		if ! grep -q sandbox-type problem.yaml
+		if ! egrep -q "^sandbox-type" problem.yaml
 		then
 			if egrep -q "^  *memory:" problem.yaml
 			then
-				sed -i.bak -e '/limits:/i sandbox-type: PC2_INTERNAL_SANDBOX\n' problem.yaml
+				sed -i.bak -e '/^limits:/i sandbox-type: PC2_INTERNAL_SANDBOX\n' problem.yaml
 			else
 				# Get correct number of spaces to indent.  We look at the line after the limits: line
 				# and make up a string of leading spaces, minus 1 space.  We do 1 less since we have to
 				# escape a space for the sed "a" command, so that uses one up.
 				spaces=`sed -n -e '/^limits:/{n;s/^[ ]\([ ][ ]*\).*/\1/p;}' < problem.yaml`
-				sed -i.bak -e '/limits:/i sandbox-type: PC2_INTERNAL_SANDBOX\n' -e "/timeout:/a \ ${spaces}memory: 2048" problem.yaml
+				sed -i.bak -e '/^limits:/i sandbox-type: PC2_INTERNAL_SANDBOX\n' -e "/timeout:/a \ ${spaces}memory: 2048" problem.yaml
 			fi
 		fi
 		cd $PC2CONFIG

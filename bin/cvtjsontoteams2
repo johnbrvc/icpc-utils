@@ -9,7 +9,7 @@ orgsjs="$2"
 # Get organizations
 for org in `jq -r '.[] | "\(.organization_id)"' < $teamsjs`
 do
-	grep '"id":"'"$org"'"' < $orgsjs | sed -e 's/,$//' -e 's/[][]//' | \
+	jq -c '.[]' < $orgsjs | grep -m 1 '"id":"'"$org"'"' | sed -e 's/,$//' -e 's/[][]//' | \
 	jq -r '. | "\(.name)\t\(.country)\tINST-U-\(.icpc_id)"'
 done >.tmp1
 echo -e "File_Version\t1\r"
