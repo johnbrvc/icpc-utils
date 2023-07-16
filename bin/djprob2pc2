@@ -79,7 +79,7 @@ then
 	exit 1
 fi
 # Fix problemset.yaml, see if we already did it, meaning, we saved the original problemset.yaml
-if ! grep "color:" problemset.yaml >/dev/null
+if ! egrep -q "color:|rgb:" problemset.yaml >/dev/null
 then
 	cp problemset.yaml problemset.yaml.orig
 	# array of 16 colors
@@ -142,6 +142,8 @@ do
 		else
 			# Ugh, need to add timelimit after limits line, also need to figure out how many spaces
 			# for yaml, since they use different numbers of spaces, ugh again.
+			# Note: this does not work right if there is a "limits:" section, but the following
+			# line does not start with spaces.
 			spaces=`sed -n -e '/^limits:/{n;s/\([ ][ ]*\).*/\1/p;}' < $porigyaml`
 #			spaces=`grep "time_multiplier:" $porigyaml  | sed -e 's/time_multiplier.*//'`
 			if test -z "$spaces"
