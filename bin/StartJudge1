@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $HOME/pc2
+pc2judge --login j1 >j1log 2>&1 &
+
