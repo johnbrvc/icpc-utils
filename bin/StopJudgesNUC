@@ -1,0 +1,12 @@
+#!/bin/bash
+#JUDGEUSER=icpc
+#JUDGEUSER=ubuntu
+URLBASE=
+#URLBASE=.icpc-css.org
+for judge in 1 2 3 4 5
+do
+	j=judge$judge@localhost
+	echo Stopping judge $judge on $j
+	ssh $j ./StopJudge
+	sleep 1
+done

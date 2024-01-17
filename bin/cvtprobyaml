@@ -1,0 +1,14 @@
+#!/bin/bash
+if test $# -ne 1
+then
+	echo Usage: $0 problems_yaml_file '> problemset.yaml'
+	exit 1
+fi
+pyaml=$1
+if test ! -s $pyaml
+then
+	echo $pyaml is not a valid problems yaml file
+	exit 2
+fi
+echo problems:
+sed -e 's/id:/short-name:/' -e 's/label:/letter:/' -e 's/^/  /' < $pyaml

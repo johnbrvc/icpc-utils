@@ -13,6 +13,7 @@ do
 	jq -r '. | "\(.name)\t\(.country)\tINST-U-\(.icpc_id)"'
 done >.tmp1
 echo -e "File_Version\t1\r"
-jq -r '.[] | "\(.id)\t\(.icpc_id)\t\(.group_ids[0])\t\(.name)\t\(.display_name)"' < $teamsjs | \
+jq -r '.[] | "\(.id)\t\(.icpc_id)\t\(.group_ids)\t\(.name)\t\(.display_name)"' < $teamsjs | \
+	sed -e 's/\["//' -e 's/"\]//' -e 's/","/,/g' | \
 	paste - .tmp1 | sed -e 's/$/\r'/
 rm -f .tmp1
