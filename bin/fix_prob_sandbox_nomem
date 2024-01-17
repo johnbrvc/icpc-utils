@@ -15,9 +15,9 @@ do
 		echo $0: no data folder for problem $prob
 	else
 		# see if we did this already
-		if ! grep -q sandbox-type problem.yaml
+		if ! egrep -q "^sandbox-type" problem.yaml
 		then
-			sed -i.bak -e '/limits:/i sandbox-type: PC2_INTERNAL_SANDBOX\n'  problem.yaml
+			sed -i.bak -e '/^limits:/i sandbox-type: PC2_INTERNAL_SANDBOX\n'  problem.yaml
 		fi
 		cd $PC2CONFIG
 	fi

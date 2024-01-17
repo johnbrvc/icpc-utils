@@ -1,4 +1,10 @@
 #!/bin/bash
 cd $HOME/pc2
-pc2admin --login a1 >alog 2>&1 &
+if test $# -gt 0
+then
+	user="$*"
+else
+	user=a1
+fi
+pc2admin --login $user >alog 2>&1 &
 

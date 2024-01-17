@@ -7,5 +7,5 @@ fi
 orgsjs="$1"
 # Get organizations
 echo -e "File_Version\t1\r"
-jq -r '.[] | "\(.icpc_id)\t\(.formal_name)\t\(.name)"' < "$orgsjs" | \
+jq -r '.[] | "INST-U-\(.icpc_id)\t\(.formal_name)\t\(.name)"' < "$orgsjs" | \
 	sed -e 's/$/\r/'

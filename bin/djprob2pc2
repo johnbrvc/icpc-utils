@@ -4,12 +4,10 @@
 # problem.yaml in each folder to problem.yaml.orig, then create a new problem.yaml
 # suitable for pc2.  At least, that's the idea.
 # John Buck, Sept 19, 2022
+# Updated: July 14, 2023 for new interactive problems
 
 MULTIPLIER=1.0
 MEMLIMIT=2048
-# Where to find the fake validator we set in PC2 to copy the result XML.  This gets
-# copied into the output_validators/*/$COPY_XML_RESULT file
-COPY_XML_RESULT=copy_xml_result
 
 doCompile()
 {
@@ -64,11 +62,9 @@ doCompile()
 		if test -s "$vd/$outfile"
 		then
 			outpath="${vd#$basedir/}/$outfile"
-			intval_outpath="${vd#$basedir/}/copy_xml_result"
 			return 0
 		else
 			outpath=""
-			intval_outpath=""
 			return 1
 		fi
 	else
@@ -83,7 +79,7 @@ then
 	exit 1
 fi
 # Fix problemset.yaml, see if we already did it, meaning, we saved the original problemset.yaml
-if ! grep "color:" problemset.yaml >/dev/null
+if ! egrep -q "color:|rgb:" problemset.yaml >/dev/null
 then
 	cp problemset.yaml problemset.yaml.orig
 	# array of 16 colors
@@ -126,7 +122,7 @@ do
 	  echo "" >> $pyaml
 	  addline=""
 	  # If there is no timeout: entry, we have to add one
-	  if ! grep timeout: "$porigyaml" >/dev/null 2>&1
+	  if ! egrep "^timeout:" "$porigyaml" >/dev/null 2>&1
 	  then
 	  	# Add limits section, if necessary
 		if ! egrep "^limits:" $porigyaml >/dev/null 2>&1
@@ -146,6 +142,8 @@ do
 		else
 			# Ugh, need to add timelimit after limits line, also need to figure out how many spaces
 			# for yaml, since they use different numbers of spaces, ugh again.
+			# Note: this does not work right if there is a "limits:" section, but the following
+			# line does not start with spaces.
 			spaces=`sed -n -e '/^limits:/{n;s/\([ ][ ]*\).*/\1/p;}' < $porigyaml`
 #			spaces=`grep "time_multiplier:" $porigyaml  | sed -e 's/time_multiplier.*//'`
 			if test -z "$spaces"
@@ -159,7 +157,7 @@ do
 	  fi
 
 	  # If this problem uses a custom validator, then we need to add PC2 specific stuff
-	  if grep "validation: custom" $porigyaml >/dev/null
+	  if egrep "^validation: custom" $porigyaml >/dev/null
 	  then
 		# Name of validator source; only handle c/c++/java right now; not kotlin. other's don't need compiling
 		vsrc=`find $prob/output_validators "(" -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cc' -o -name '*.py' ")" -a -print`
@@ -174,30 +172,14 @@ do
 				then
 					# Add pc2 validator section
 					echo "validator:" >> $pyaml
-					if grep -q "validation: custom interactive" $porigyaml
-					then
-						# For interactive validator, command line just has validator name.
-						# The rest is filled in by the pc2*_interactive.sh script(s)
-						echo "  validatorProg: '"$intval_outpath"'" >> $pyaml
-						echo "  validatorCmd: '{:validator}'" >> $pyaml
-						echo "  usingInternal: false" >> $pyaml
-						echo "  validatorOption: 0" >> $pyaml
-						echo "  use-internal-validator: false" >> $pyaml
-						echo "  use-clics-validator: false" >> $pyaml
-						echo "  use-custom-validator: true" >> $pyaml
-						# This is for the post-interactive validator, not validatorProg!
-						# validatorProg is always CLICS.
-						echo "  use-clics-custom-validator-interface: false" >> $pyaml
-					else
-						echo "  validatorProg: '"$outpath"'" >> $pyaml
-						echo "  validatorCmd: '{:validator} {:infile} {:ansfile} {:feedbackdir}'" >> $pyaml
-						echo "  usingInternal: false" >> $pyaml
-						echo "  validatorOption: 0" >> $pyaml
-						echo "  use-internal-validator: false" >> $pyaml
-						echo "  use-clics-validator: false" >> $pyaml
-						echo "  use-custom-validator: true" >> $pyaml
-						echo "  use-clics-custom-validator-interface: true" >> $pyaml
-					fi
+					echo "  validatorProg: '"$outpath"'" >> $pyaml
+					echo "  validatorCmd: '{:validator} {:infile} {:ansfile} {:feedbackdir}'" >> $pyaml
+					echo "  usingInternal: false" >> $pyaml
+					echo "  validatorOption: 0" >> $pyaml
+					echo "  use-internal-validator: false" >> $pyaml
+					echo "  use-clics-validator: false" >> $pyaml
+					echo "  use-custom-validator: true" >> $pyaml
+					echo "  use-clics-custom-validator-interface: true" >> $pyaml
 				else
 					echo $0: Build of $vsrc has failed
 				fi
