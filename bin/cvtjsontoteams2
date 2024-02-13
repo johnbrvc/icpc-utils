@@ -6,6 +6,15 @@ then
 fi
 teamsjs="$1"
 orgsjs="$2"
+# Check organizations
+grep '"name":""' $orgsjs > .tmp1
+if test -s .tmp1
+then
+	echo $0: The following schools "(organizations.json)" have an empty '"name"' property.  Please fix before running this script!! >&2
+	cat .tmp1 >&2
+	rm -f .tmp1
+	exit 1
+fi
 # Get organizations
 for org in `jq -r '.[] | "\(.organization_id)"' < $teamsjs`
 do
