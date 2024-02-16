@@ -1,0 +1,22 @@
+#!/bin/bash
+#JUDGEUSER=icpc
+JUDGEUSER=judge
+#JUDGEUSER=ubuntu
+URLBASE=
+#URLBASE=.icpc-css.org
+args="$*"
+numjudge=`grep "^judge" /etc/passwd | wc -l`
+if test "$numjudge" -gt 20
+then
+	echo $0: Too many judges $numjudge
+	exit 1
+fi
+j=0
+while test $j -ne "$numjudge"
+do
+	j=$((j+1))
+	host="$JUDGEUSER$j@localhost"
+	echo '***************' Judge $j '******************'
+	ssh -4 $host "$args"
+done
+

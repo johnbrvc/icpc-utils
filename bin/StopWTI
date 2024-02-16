@@ -1,0 +1,10 @@
+#!/bin/bash
+pid=`ps -C java -o pid,args | grep WebTeam | sed -e 's/^  *//' -e 's/ .*//'`
+if test -n "$pid"
+then
+        kill "$pid"
+else
+        echo WTI is not running.
+fi
+exit 0
+

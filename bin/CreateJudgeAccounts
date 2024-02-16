@@ -1,0 +1,43 @@
+#!/bin/bash
+# Group to make judges.  We have to use 'ubuntu' and not judges due to sandboxes and
+# permissions on /sys/fs/cgroup/pc2
+# John Buck
+JGROUP=ubuntu
+JUDGE_BASE=101
+UID_BASE=2000
+
+if test $# -ne 1
+then
+	echo Usage: $0 '#'judges
+	exit 1
+fi
+gid=`getent group $JGROUP | cut -d: -f3`
+numj=$1
+curj=0
+while test $curj -ne $numj
+do
+	user=judge$((curj+JUDGE_BASE))
+	uid=$((UID_BASE+JUDGE_BASE+curj))
+	if getent passwd $user >/dev/null 2>&1
+	then
+		echo $user already exists - skipping.
+		continue
+	fi
+	dir=/home/$user
+	echo Executing: adduser --home $dir --shell /bin/bash --uid $uid --gid $gid --disabled-password --gecos "PC2 $curj" $user
+	if adduser --home $dir --shell /bin/bash --uid $uid --gid $gid --disabled-password --gecos "PC2 $curj" $user
+	then
+		echo Added $user
+		cp RemoteStartJudgeByUser.sh $dir/StartJudge.sh
+		cp RemoteStopJudgeByUser.sh $dir/StopJudge.sh
+		mkdir $dir/.ssh
+		chmod 700 $dir/.ssh
+		cp /home/ubuntu/.ssh/* $dir/.ssh
+		chown -R $user.$JGRUOP $dir
+		rm -f $dir/pc2v9.ini
+		ln -s /home/ubuntu/pc2/pc2v9.ini $dir/pc2v9.ini
+	else
+		echo Error adding $user
+	fi
+	curj=$((curj+1))
+done

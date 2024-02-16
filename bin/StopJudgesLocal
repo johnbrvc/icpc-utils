@@ -1,0 +1,30 @@
+#!/bin/bash
+#JUDGEUSER=icpc
+JUDGEUSER=judge
+#JUDGEUSER=ubuntu
+URLBASE=
+#URLBASE=.icpc-css.org
+if test $# -eq 1
+then
+	jcnt=$1
+else
+	jcnt=2
+fi
+if test "$jcnt" -gt 10
+then
+	echo $0: Really'?'  That many'?' Do it by hand.
+	exit 2
+fi
+judge=0
+for juser in `egrep "^$JUDGEUSER[0-9]" /etc/passwd | cut -d: -f1`
+do
+	if test $judge -ge $jcnt
+	then
+		break
+	fi
+	judge=$((judge+1))
+	j=$juser@localhost
+	echo Stopping judge on $j
+	ssh $j ./StopJudge.sh
+	sleep 1
+done
