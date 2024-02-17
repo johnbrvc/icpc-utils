@@ -6,5 +6,5 @@ then
 else
 	user=a1
 fi
-pc2admin --login $user >alog 2>&1 &
+pc2admin --login $user $PC2CLIENTOPTS >alog 2>&1 &
 
