@@ -21,23 +21,23 @@ do
 	if getent passwd $user >/dev/null 2>&1
 	then
 		echo $user already exists - skipping.
-		continue
-	fi
-	dir=/home/$user
-	echo Executing: adduser --home $dir --shell /bin/bash --uid $uid --gid $gid --disabled-password --gecos "PC2 $curj" $user
-	if adduser --home $dir --shell /bin/bash --uid $uid --gid $gid --disabled-password --gecos "PC2 $curj" $user
-	then
-		echo Added $user
-		cp RemoteStartJudgeByUser.sh $dir/StartJudge.sh
-		cp RemoteStopJudgeByUser.sh $dir/StopJudge.sh
-		mkdir $dir/.ssh
-		chmod 700 $dir/.ssh
-		cp /home/ubuntu/.ssh/* $dir/.ssh
-		chown -R $user.$JGRUOP $dir
-		rm -f $dir/pc2v9.ini
-		ln -s /home/ubuntu/pc2/pc2v9.ini $dir/pc2v9.ini
 	else
-		echo Error adding $user
+		dir=/home/$user
+		echo Executing: adduser --home $dir --shell /bin/bash --uid $uid --gid $gid --disabled-password --gecos "PC2 $curj" $user
+		if adduser --home $dir --shell /bin/bash --uid $uid --gid $gid --disabled-password --gecos "PC2 $curj" $user
+		then
+			echo Added $user
+			cp RemoteStartJudgeByUser.sh $dir/StartJudge.sh
+			cp RemoteStopJudgeByUser.sh $dir/StopJudge.sh
+			mkdir $dir/.ssh
+			chmod 700 $dir/.ssh
+			cp /home/ubuntu/.ssh/* $dir/.ssh
+			chown -R $user.$JGRUOP $dir
+			rm -f $dir/pc2v9.ini
+			ln -s /home/ubuntu/pc2/pc2v9.ini $dir/pc2v9.ini
+		else
+			echo Error adding $user
+		fi
 	fi
 	curj=$((curj+1))
 done
