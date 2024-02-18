@@ -1,4 +1,4 @@
 #!/bin/bash
 cd $HOME/pc2
-nohup pc2ef --login feeder1 >elog 2>&1 &
+nohup pc2ef --login feeder1 $PC2CLIENTOPTS >elog 2>&1 &
 
