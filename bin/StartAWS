@@ -1,0 +1,35 @@
+#!/bin/bash
+# Starts AWS Instances
+#aws ec2 start-instances --instance-ids i-0359f80db3a381f43
+# Will convert names to instance ids
+#
+if test $# -lt 1
+then
+	echo Usage: $0 instance-id ...
+	exit 1
+fi
+ilist=""
+need=""
+for file in $*
+do
+	if [[ $file == i-* ]]
+	then
+		ilist=$ilist" "$file
+	else
+		if test -n "$need"
+		then
+			need=$need,
+		fi
+		need=$need$file
+	fi
+done
+if test -n "$need"
+then
+	insts=`aws ec2 describe-instances --filters "Name=tag:Name,Values=$need" --query 'Reservations[].Instances[].[InstanceId]' --output text`
+else
+	insts=""
+fi
+ilist=$ilist" "$insts
+
+echo Starting AWS Instances $ilist
+aws ec2 start-instances --instance-ids $ilist
