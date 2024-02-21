@@ -1,0 +1,25 @@
+#!/bin/bash
+# Starts AWS Instances for Auto-judges
+#aws ec2 start-instances --instance-ids i-0359f80db3a381f43
+# Will convert names to instance ids
+#
+need=""
+ilist=""
+for file in 1 2 3 4 5
+do
+	if test -n "$need"
+	then
+		need=$need,
+	fi
+	need=$need"pc2-aj$file"
+done
+if test -n "$need"
+then
+	insts=`aws ec2 describe-instances --filters "Name=tag:Name,Values=$need" --query 'Reservations[].Instances[].[InstanceId]' --output text`
+else
+	insts=""
+fi
+ilist=$ilist" "$insts
+
+echo Starting AWS Instances $ilist
+aws ec2 start-instances --instance-ids $ilist
