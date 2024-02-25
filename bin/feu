@@ -1,0 +1,12 @@
+#!/bin/bash
+JUDGEUSER=ubuntu
+URLBASE=
+#URLBASE=.icpc-css.org
+args="$*"
+for j in 1 2 3 4 5
+do
+	host="$JUDGEUSER@pc2-aj$j$URLBASE"
+	echo '***************' Judge $j '******************'
+	ssh -4 $host "$args"
+done
+
