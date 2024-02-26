@@ -2,7 +2,7 @@
 cd $HOME/pc2/wti/WebTeamInterface-1.1
 
 # Get outward IP address
-MYEXTIP=`nslookup contest.icpc-vcss.org | sed -n -e '/authorit/,$s/^Address: //p'`
+MYEXTIP=`nslookup pacnwreal.icpc-vcss.org | sed -n -e '/authorit/,$s/^Address: //p'`
 echo "Out outward facing IP is: $MYEXTIP"
 sed -i -e "s/^wtiOverridePublicIP.*/wtiOverridePublicIP=$MYEXTIP/" pc2v9.ini
 pid=`ps -C java -o pid,args | grep WebTeam | sed -e 's/^  *//' -e 's/ .*//'`

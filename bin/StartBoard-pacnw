@@ -1,0 +1,6 @@
+#!/bin/bash
+cd $HOME/pc2
+pc2board --login b1 $PC2CLIENTOPTS >jlog $* 2>&1 &
+sleep 5
+./distribute_score >dist.log 2>&1 &
+

@@ -1,0 +1,20 @@
+#!/bin/bash
+JUDGE_USER=judge
+#JUDGE_USER=ubuntu
+URLBASE=
+#URLBASE=.icpc-vcss.org
+
+if test $# -ne 2
+then
+	echo Usage: $0 source dest
+	exit 1
+fi
+src=$1
+dst=$2
+for j in 1 2 3 4 5
+do
+	jnum=$((j+100))
+	juser=$JUDGE_USER$jnum
+	echo Copying "$src" to "$juser@pc2-aj$j$URLBASE:$dst"
+	scp -p "$src" "$juser@pc2-aj$j$URLBASE:$dst"
+done

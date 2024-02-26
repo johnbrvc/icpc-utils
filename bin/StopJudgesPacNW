@@ -1,0 +1,29 @@
+#!/bin/bash
+DEBUG=
+#JUDGEUSER=icpc
+JUDGEUSER=judge
+#JUDGEUSER=ubuntu
+URLBASE=
+#URLBASE=.icpc-css.org
+if test $# -eq 1
+then
+	jcnt=$1
+else
+	jcnt=5
+fi
+if test "$jcnt" -gt 10
+then
+	echo $0: Really'?'  That many'?' Do it by hand.
+	exit 2
+fi
+judge=0
+while test $judge -ne "$jcnt"
+do
+	judge=$((judge+1))
+	jval=$((judge+100))
+	j=$JUDGEUSER$jval@pc2-aj$judge$URLBASE
+#	j=$JUDGEUSER$judge@localhost
+	echo Stopping judge $judge on $j
+	$DEBUG ssh $j ./StopJudge.sh
+	sleep 1
+done
