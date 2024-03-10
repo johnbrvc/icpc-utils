@@ -19,6 +19,11 @@ then
 else
 	insts=""
 fi
+if test -z "$insts"
+then
+	echo $0: No instances found matching $need
+	exit 1
+fi
 ilist=$ilist" "$insts
 
 echo Starting AWS Instances $ilist
