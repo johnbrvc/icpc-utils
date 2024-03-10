@@ -8,6 +8,6 @@ for j in 1 2 3 4
 do
 	host="$JUDGEUSER@pc2-aj$j$URLBASE"
 	echo '***************' Judge $j '******************'
-	ssh -4 $host "$args"
+	ssh -4 $host "cat /proc/loadavg | cut --delim=' ' -f1"
 done
 

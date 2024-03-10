@@ -27,12 +27,12 @@ then
 else
 	if test -s "$JUDGEPASSFILE"
 	then
-		PASS=`cat $JUDGEPASSFILE`
+		PASS="--password "`cat $JUDGEPASSFILE`
 	else
-		PASS=$USER
+		PASS=""
 	fi
 	rm -f logs/* 
 	rm -rf executesite*
-	$DEBUG nohup pc2judge --login j$j --password $PASS $NOGUI >jlog_$j".log" 2>&1 &
+	$DEBUG nohup pc2judge --login j$j $PASS $NOGUI >jlog_$j".log" 2>&1 &
 fi
 exit 0

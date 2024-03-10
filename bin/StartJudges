@@ -1,14 +1,14 @@
 #!/bin/bash
 #JUDGEUSER=icpc
-JUDGEUSER=judge
-#JUDGEUSER=ubuntu
-URLBASE=
-#URLBASE=.icpc-css.org
+#JUDGEUSER=judge
+JUDGEUSER=ubuntu
+#URLBASE=
+URLBASE=.icpc-vcss.org
 if test $# -eq 1
 then
 	jcnt=$1
 else
-	jcnt=2
+	jcnt=4
 fi
 if test "$jcnt" -gt 10
 then
@@ -19,9 +19,9 @@ judge=0
 while test $judge -ne "$jcnt"
 do
 	judge=$((judge+1))
-	j=$JUDGEUSER@pc2judge$judge$URLBASE
+	j=$JUDGEUSER@pc2-aj$judge$URLBASE
 #	j=$JUDGEUSER$judge@localhost
 	echo Starting judge $judge on $j
-	echo ssh $j ./StartJudge.sh
+	ssh $j /home/ubuntu/repos/icpc-utils/bin/RemoteStartJudgeByNumber.sh $judge
 	sleep 1
 done
