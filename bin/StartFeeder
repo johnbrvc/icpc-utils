@@ -1,4 +1,10 @@
 #!/bin/bash
 cd $HOME/pc2
-nohup pc2ef --login feeder1 $PC2CLIENTOPTS >elog 2>&1 &
+if test $# -gt 0
+then
+	user="$*"
+else
+	user=ef1
+fi
+pc2ef --login $user $PC2CLIENTOPTS >elog 2>&1 &
 

@@ -1,0 +1,27 @@
+#!/bin/bash
+#JUDGE_USER=icpc
+JUDGE_USER=ubuntu
+#URLBASE=
+URLBASE=.icpc-vcss.org
+
+if test $# -ne 1
+then
+	echo Usage: $0 reponame
+	exit 1
+fi
+r=$1
+cd /home/ubuntu/repos
+if test ! -d $r
+then
+	echo /home/ubuntu/repos/$r does not exist
+	exit 2
+fi
+
+src=$r
+dst=repos
+for j in 2 3 4
+#for j in 1
+do
+	echo Rsyncing "$src" to "$JUDGE_USER@pc2-aj$j$URLBASE:$dst"
+	rsync -4ae ssh "$src" "$JUDGE_USER@pc2-aj$j$URLBASE:$dst"
+done
