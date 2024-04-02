@@ -4,6 +4,8 @@ JUDGEUSER=ubuntu
 URLBASE=
 URLBASE=.icpc-vcss.org
 args="$*"
+echo '***************' Server '******************'
+cat /proc/loadavg | cut --delim=' ' -f1
 for j in 1 2 3 4 
 do
 	host="$JUDGEUSER@pc2-aj$j$URLBASE"
