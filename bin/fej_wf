@@ -1,0 +1,11 @@
+#!/bin/bash
+args="$*"
+. judge_setup_env
+
+for j in ${JUDGE_LIST}
+do
+	SetContestInfo $j
+	host="$JUDGEUSER@pc2-aj$j$URLBASE"
+	echo '***************' Contest $contest - Judge pc2-aj$j - Judge Num $jord  '******************'
+	ssh -4 $host "$args"
+done

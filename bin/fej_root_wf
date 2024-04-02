@@ -1,0 +1,10 @@
+#!/bin/bash
+args="$*"
+. judge_setup_env
+
+for j in ${JUDGE_LIST}
+do
+	host="root@pc2-aj$j$URLBASE"
+	echo '***************' ROOT Judge $j '******************'
+	ssh -4 $host $args 
+done

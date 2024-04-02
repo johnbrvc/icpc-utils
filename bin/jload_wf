@@ -1,0 +1,13 @@
+#!/bin/bash
+. judge_setup_env
+
+args="$*"
+echo '***************' Server '******************'
+cat /proc/loadavg | cut --delim=' ' -f1
+for j in ${ALL_JUDGE_LIST}
+do
+	SetContestInfo $j
+	host="$JUDGEUSER@pc2-aj$j$URLBASE"
+	echo '***************' Contest $contest - Judge pc2-aj$j - Judge Num $jord  '******************'
+	ssh -4 $host "cat /proc/loadavg | cut --delim=' ' -f1"
+done

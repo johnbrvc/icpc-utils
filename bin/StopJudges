@@ -1,9 +1,6 @@
 #!/bin/bash
-#JUDGEUSER=icpc
-JUDGEUSER=ubuntu
-#URLBASE=
-URLBASE=.icpc-vcss.org
-for judge in 1 2 3 4 
+. judge_setup_env
+for judge in ${JUDGE_LIST}
 do
 	j=$JUDGEUSER@pc2-aj$judge$URLBASE
 	echo Stopping judge $judge on $j
