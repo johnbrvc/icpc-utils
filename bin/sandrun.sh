@@ -82,15 +82,15 @@ then
 	locansfile=${databasename/.in/.ans}
 	tryfile=${databasename/.in/.try}
 	echo For testcase $testcase:
-	echo "    " Copying the following Input file: $infile to current folder $locinfile
+	echo "    " Copying judge"'"s input file: $infile to current folder $locinfile
 	cp $infile .
-	echo "    " The "judge's" answer file: $ansfile to current folder $locansfile
+	echo "    " Copying "judge's" answer file: $ansfile to current folder $locansfile
 	cp $ansfile .
-	echo "    " Using the following output/answer file: $tryfile
+	echo "    " Using the following output/answer file for test run: $tryfile
 	echo "    " Executing: "./pc2sandbox.sh $memlim $timelim $cmd < $locinfile >$tryfile"
 	echo "_____________________________________"
 	./pc2sandbox.sh $memlim $timelim $cmd < $locinfile >$tryfile
-	if ! diff -w $tryfile $locansfile
+	if ! diff -w $tryfile $locansfile >/dev/null
 	then
 		echo '***** OUTPUT DIFFERS FROM JUDGES *****'
 	fi
