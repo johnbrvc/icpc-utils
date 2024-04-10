@@ -3,10 +3,9 @@
 JUDGES_46=`cat $HOME/autojudges_46.txt`
 JUDGES_47=`cat $HOME/autojudges_47.txt`
 ALL_JUDGE_LIST="${JUDGES_46} ${JUDGES_47}"
-myhost=`cat /etc/hostname`
-hostnum="${myhost//[[:alpha:]\-]/}"
-CCS_BASE_47=5
-CCS_MAX=8
+hostnum=`sed -e 's/.*[^0-9]\([0-9][0-9]*\)$/\1/' < /etc/hostname`
+CCS_BASE_47=10
+CCS_MAX=10
 if test -z ${hostnum}
 then
 	hostnum=1
@@ -24,13 +23,13 @@ else
 	AJ_BASE=1
 	JUDGE_LIST=${JUDGES_46}
 fi
-JUDGEUSER=icpc
+JUDGEUSER=icpc2023
 if ! getent passwd ${JUDGEUSER} >/dev/null 2>&1
 then
 	JUDGEUSER=ubuntu
 fi
-#URLBASE=
-URLBASE=.icpc-vcss.org
+URLBASE=
+#URLBASE=.icpc-vcss.org
 
 #echo contest $contest AJ_BASE $AJ_BASE
 

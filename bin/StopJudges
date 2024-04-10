@@ -4,6 +4,6 @@ for judge in ${JUDGE_LIST}
 do
 	j=$JUDGEUSER@pc2-aj$judge$URLBASE
 	echo Stopping judge $judge on $j
-	ssh $j /home/ubuntu/repos/icpc-utils/bin/RemoteStopJudgeByNumber.sh
+	ssh $j /home/${JUDGEUSER}/repos/icpc-utils/bin/RemoteStopJudgeByNumber.sh
 	sleep 1
 done

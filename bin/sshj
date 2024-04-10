@@ -1,9 +1,10 @@
 #!/bin/bash
+. judge_setup_env
 if test #$ -ne 1
 then
 	echo Usage: $0 judge'#'
 	exit 1
 fi
-
-host=ubuntu@pc2-aj$1.icpc-vcss.org
+j=$1
+host=$JUDGEUSER@pc2-aj$j$URLBASE
 exec ssh $host

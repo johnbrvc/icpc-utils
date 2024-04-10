@@ -1,8 +1,8 @@
 #!/bin/bash
-#JUDGEUSER=icpc
-JUDGEUSER=ubuntu
+JUDGEUSER=icpc2023
+#JUDGEUSER=ubuntu
 URLBASE=
-URLBASE=.icpc-vcss.org
+#URLBASE=.icpc-vcss.org
 args="$*"
 for j in 1 2 3 4 
 do

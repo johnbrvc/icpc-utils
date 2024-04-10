@@ -8,17 +8,15 @@ if test $# -gt 0
 then
 	args="$*"
 else
-	args="$ALL_JUDGE_LIST"
+	echo $0: You must specify the server host name
+	exit 1
 fi
 cd $HOME
-for j in $args
+for hostname in $args
 do
-	SetContestInfo $j
-	host="$JUDGEUSER@pc2-aj$j$URLBASE"
+	host="$JUDGEUSER@$hostname$URLBASE"
 	cmd="rsync -avz pc2 $host:."
 	echo Executing: "$cmd"
 	$cmd
-	cmd="rsync -avz pc2/remote/pc2v9.ini.$contest $host:./pc2v9.ini"
-	echo Executing: "$cmd"
 	$cmd
 done

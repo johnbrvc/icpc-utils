@@ -1,11 +1,13 @@
 #!/bin/bash
-if test $# -ne 1
+ICPCUSER=icpc2023
+if test $# -lt 1 -o $# -gt 2
 then
-	echo Usage: $0 contest_path
-	echo "      eg. $0 /home/ubuntu/repos/wfluxor/contests/wf46/systest1"
+	echo Usage: $0 contest_path "[-serveronly]"
+echo "      eg. $0 /home/${ICPCUSER}/repos/wfluxor/contests/wf46/systest1"
 	exit 1
 fi
 cpath="$1"
+svr="$2"
 if test ! -d ${cpath}
 then
 	echo Invalid contest path: ${cpath}
@@ -15,4 +17,7 @@ cd ~/pc2
 rm current
 ln -s ${cpath} current
 ls -l ~/pc2/current
-fej 'cd pc2; rm current; rm -rf logs ?log; ln -s "'${cpath}'" current; ls -l ~/pc2/current'
+if test -z "$svr"
+then
+	fej 'cd pc2; rm current; rm -rf logs ?log; ln -s "'${cpath}'" current; ls -l ~/pc2/current'
+fi

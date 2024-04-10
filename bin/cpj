@@ -1,8 +1,8 @@
 #!/bin/bash
 #JUDGE_USER=icpc
-JUDGE_USER=ubuntu
-#URLBASE=
-URLBASE=.icpc-vcss.org
+JUDGE_USER=icpc2023
+URLBASE=
+#URLBASE=.icpc-vcss.org
 
 if test $# -ne 2
 then

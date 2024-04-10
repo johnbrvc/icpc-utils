@@ -1,16 +1,17 @@
 #!/bin/bash
+# Start judges for this contest
+. judge_setup_env
 if test $# -eq 1
 then
 	jcnt=$1
 else
-	jcnt=4
+	jcnt=$CCS_MAX
 fi
-if test "$jcnt" -gt 10
+if test "$jcnt" -gt 20
 then
 	echo $0: Really'?'  That many'?' Do it by hand.
 	exit 2
 fi
-. judge_setup_env
 judge=0
 while test $judge -ne "$jcnt"
 do
