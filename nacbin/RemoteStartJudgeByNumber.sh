@@ -3,24 +3,31 @@
 # called by something like: ssh ubuntu@pc2judge2.icpc-vcss.org StartJudgeFromRemote 2
 # That would start autojudge "judge2" in pc2.
 DEBUG=
-. judge_setup_env
+
 cd $HOME/pc2
 PATH=/usr/pc2/bin:$PATH
 NOGUI=--nogui
-JUDGEPASSFILE=/home/$JUDGEUSER/pc2/judgepass.txt
-if test $# -ne 1
+JUDGEPASSFILE=/home/ubuntu/pc2/judgepass.txt
+if test $# -eq 0
 then
-	echo $0: Must supply the autojudge number to start
+	echo $0: Usage: $0 judgenumber "[gui]"
 	exit 1
 fi
 j=$1
-if test "$j" -lt 1 -o "$j" -gt $CCS_MAX
+if test $# -ge 2
+then
+        if test "$2" = "gui"
+        then
+                NOGUI=""
+        fi
+fi
+if test "$j" -lt 1 -o "$j" -gt 20
 then
 	echo $0: Invalid autojudge number $j
 	exit 2
 fi
 
-pids=`pgrep -u $JUDGEUSER java`
+pids=`pgrep -u $USER java`
 if test -n "$pids"
 then
 	echo $0: It looks like $USER is already running.

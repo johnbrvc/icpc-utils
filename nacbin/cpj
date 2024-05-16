@@ -1,9 +1,4 @@
 #!/bin/bash
-#JUDGE_USER=icpc
-JUDGE_USER=icpc2023
-URLBASE=
-#URLBASE=.icpc-vcss.org
-
 if test $# -ne 2
 then
 	echo Usage: $0 source dest
@@ -11,8 +6,11 @@ then
 fi
 src=$1
 dst=$2
-for j in 1 2 3 4 5
+. get_judge_info
+#
+# Extracts hostnames matching "$JUDGE_PREFIX" followed by numbers
+for j in ${JUDGE_LIST}
 do
-	echo Copying "$src" to "$JUDGE_USER@pc2-aj$j$URLBASE:$dst"
-	scp -4 -p "$src" "$JUDGE_USER@pc2-aj$j$URLBASE:$dst"
+	echo Copying "$src" to "$JUDGE_USER@$j:$dst"
+	scp -4 -p "$src" "$JUDGE_USER@$j:$dst"
 done

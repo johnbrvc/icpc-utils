@@ -1,0 +1,24 @@
+#!/bin/bash
+# Start judges for this contest
+. judge_setup_env
+if test $# -eq 1
+then
+	jcnt=$1
+else
+	jcnt=$CCS_MAX
+fi
+if test "$jcnt" -gt 20
+then
+	echo $0: Really'?'  That many'?' Do it by hand.
+	exit 2
+fi
+judge=0
+while test $judge -ne "$jcnt"
+do
+	judgeno=$((judge+AJ_BASE))
+	judge=$((judge+1))
+	j=$JUDGEUSER@pc2-aj$judgeno$URLBASE
+	echo Starting judge $judgeno "(index $judge)" on $j
+	ssh $j /home/ubuntu/repos/icpc-utils/bin/RemoteStartJudgeByNumber.sh $judge
+	sleep 1
+done

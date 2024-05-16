@@ -1,6 +1,7 @@
 #!/bin/bash
 #WEB="https://pc2:PacNW@contest.icpc-vss.org:50443"
-WEB="https://pc2:PacNW@localhost:50443"
+#WEB="https://pc2:PacNW@localhost:50443"
+WEB="https://pc2:pusher-upper-crier-purple@domjudge.nac.icpc.global/api/contests/nac"
 
 mkdir -p replay
 

@@ -1,10 +1,17 @@
 #!/bin/bash
-. judge_setup_env
-if test #$ -ne 1
+. get_judge_info
+
+if test $# -ne 1
 then
 	echo Usage: $0 judge'#'
+	echo Available judges are: `echo ${JUDGE_LIST} | sed -e "s/${JUDGE_PREFIX}//g"`
 	exit 1
 fi
 j=$1
-host=$JUDGEUSER@pc2-aj$j$URLBASE
-exec ssh $host
+if [[ $j == [0-9]* ]]
+then
+	j=${JUDGE_PREFIX}$j
+fi
+host=$JUDGE_USER@$j
+echo "Executing: ssh -4 $host"
+exec ssh -4 $host

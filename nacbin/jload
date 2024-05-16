@@ -1,15 +1,12 @@
 #!/bin/bash
-#JUDGEUSER=icpc
-JUDGEUSER=ubuntu
-URLBASE=
-URLBASE=.icpc-vcss.org
-args="$*"
-echo '***************' Server '******************'
-cat /proc/loadavg | cut --delim=' ' -f1
-for j in 1 2 3 4 
+. get_judge_info
+
+echo '***************' Server $PC2SERVER '***************'
+ssh -4 ${SERVER_USER}@${PC2SERVER} "cat /proc/loadavg | cut --delim=' ' -f1"
+for j in ${JUDGE_LIST}
 do
-	host="$JUDGEUSER@pc2-aj$j$URLBASE"
-	echo '***************' Judge $j '******************'
+	host="${JUDGE_USER}@$j"
+	echo '***************' $j '******************'
 	ssh -4 $host "cat /proc/loadavg | cut --delim=' ' -f1"
 done
 

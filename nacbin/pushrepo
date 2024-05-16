@@ -1,5 +1,7 @@
 #!/bin/bash
-. judge_setup_env
+REPOS=$HOME/repos
+
+. get_judge_info
 
 if test $# -ne 1
 then
@@ -7,19 +9,28 @@ then
 	exit 1
 fi
 r=$1
-cd /home/$JUDGE_USER/repos
+if test ! -d ${REPOS}
+then
+	echo $0: Can not find the repos folder: $REPOS
+	exit 3
+fi
+cd ${REPOS}
 if test ! -d $r
 then
-	echo /home/ubuntu/repos/$r does not exist
+	echo $0: No repo: ${REPOS}/$r does not exist
 	exit 2
 fi
 
 src=$r
 dst=repos
+hostlist="${SERVER_USER}@${PC2SERVER}"
+
 for j in ${JUDGE_LIST}
 do
-	SetContestInfo $j
-	host="$JUDGEUSER@pc2-aj$j$URLBASE"
-	echo Rsyncing "$src" to "$host:$dst" "(Contest $contest - Judge pc2-aj$j - Judge Num $jord)..."
+	hostlist=$hostlist" $JUDGE_USER@$j"
+done
+for host in ${hostlist}
+do
+	echo Rsyncing "$src" to "$host:$dst" 
 	rsync -4ae ssh "$src" "$host:$dst"
 done

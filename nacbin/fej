@@ -1,12 +1,9 @@
 #!/bin/bash
-JUDGEUSER=icpc2023
-#JUDGEUSER=ubuntu
-URLBASE=
-#URLBASE=.icpc-vcss.org
+. get_judge_info
 args="$*"
-for j in 1 2 3 4 5
+for j in ${JUDGE_LIST}
 do
-	host="$JUDGEUSER@pc2-aj$j$URLBASE"
+	host="$JUDGE_USER@$j"
 	echo '***************' Judge $j '******************'
 	ssh -4 $host "$args"
 done
