@@ -1,0 +1,31 @@
+#!/bin/bash
+TEXFILE=problem.tex
+TEXENFILE=problem.en.tex
+
+if test ! -s problist
+then
+	echo $0: Must be run from config folder and must have problist file
+	exit 1
+fi
+for prob in `cat problist`
+do
+	d=$prob/problem_statement
+	t=$d/$TEXFILE
+	ten=$d/$TEXENFILE
+	if test ! -d $d
+	then
+		echo Making $d and $ten
+		mkdir -p $d
+		echo '\problemname{'"$prob"'}' > $ten
+	elif test ! -s $t
+	then
+		if test ! -s $ten
+		then
+			echo Neither $t nor $ten exist
+		else
+			echo Found TEX file $ten
+		fi
+	else
+		echo Found TEX file $t
+	fi
+done
