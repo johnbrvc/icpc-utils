@@ -1,0 +1,23 @@
+#!/bin/bash
+#WEB="https://pc2:PacNW@contest.icpc-vss.org:50443"
+#WEB="https://pc2:PacNW@localhost:50443"
+WEB="https://pc2:PETITE-PASSCODE-champion-patchy@calcb.gehack.nl:46443/api/contests/wf47_systest1"
+wget -O starttime --no-check-certificate "$WEB"/starttime
+wget -O contest --no-check-certificate "$WEB"/contest
+wget -O scoreboard --no-check-certificate "$WEB"/contest/scoreboard
+wget -O languages --no-check-certificate "$WEB"/contest/languages
+wget -O teams --no-check-certificate "$WEB"/contest/teams
+wget -O groups --no-check-certificate "$WEB"/contest/groups
+wget -O organizations --no-check-certificate "$WEB"/contest/organizations
+wget -O judgement-types --no-check-certificate "$WEB"/contest/judgement-types
+wget -O clarifications --no-check-certificate "$WEB"/contest/clarifications
+wget -O submissions --no-check-certificate "$WEB"/contest/submissions
+wget -O problems --no-check-certificate "$WEB"/contest/problems
+wget -O judgements --no-check-certificate "$WEB"/contest/judgements
+wget -O runs --no-check-certificate "$WEB"/contest/runs
+wget -O state --no-check-certificate "$WEB"/contest/state
+
+
+echo "This last one will hang waiting for more events.  Just ^C after it stops getting data..."
+wget -O event-feed --no-check-certificate "$WEB"/contest/event-feed
+

@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $HOME/pc2
+rm -rf profiles.properties profiles logs alog slog 
+exit 0

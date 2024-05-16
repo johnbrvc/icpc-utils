@@ -1,0 +1,13 @@
+#!/bin/bash
+JUDGEUSER=icpc2023
+#JUDGEUSER=ubuntu
+URLBASE=
+#URLBASE=.icpc-vcss.org
+args="$*"
+for j in 1 2 3 4 5
+do
+	host="$JUDGEUSER@pc2-aj$j$URLBASE"
+	echo '***************' Judge $j '******************'
+	ssh -4 $host "$args"
+done
+

@@ -1,0 +1,25 @@
+#!/bin/bash
+. judge_setup_env
+
+if test $# -ne 1
+then
+	echo Usage: $0 reponame
+	exit 1
+fi
+r=$1
+cd /home/$JUDGE_USER/repos
+if test ! -d $r
+then
+	echo /home/ubuntu/repos/$r does not exist
+	exit 2
+fi
+
+src=$r
+dst=repos
+for j in ${JUDGE_LIST}
+do
+	SetContestInfo $j
+	host="$JUDGEUSER@pc2-aj$j$URLBASE"
+	echo Rsyncing "$src" to "$host:$dst" "(Contest $contest - Judge pc2-aj$j - Judge Num $jord)..."
+	rsync -4ae ssh "$src" "$host:$dst"
+done
