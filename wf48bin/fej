@@ -1,0 +1,10 @@
+#!/bin/bash
+. get_judge_info
+args="$*"
+for j in ${JUDGE_LIST}
+do
+	host="$JUDGE_USER@$j"
+	echo '***************' Judge $j '******************'
+	ssh -4 $host "$args"
+done
+

@@ -1,0 +1,15 @@
+127.0.0.1 localhost
+10.0.36.45 nacpc2server nacserver
+10.0.33.38    pc2-aj1
+10.0.33.225 	 pc2-aj2
+10.0.45.150	pc2-aj3
+10.0.41.63 pc2-aj4
+10.0.43.72 pc2-aj5
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+

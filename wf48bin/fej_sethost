@@ -1,0 +1,10 @@
+#!/bin/bash
+. get_judge_info
+args="$*"
+for j in ${JUDGE_LIST}
+do
+	host="root@$j"
+	echo '***************' ROOT Setting hostname for Judge $j '******************'
+	ssh -4 $host "echo $j > /etc/hostname; hostname -F /etc/hostname"
+done
+

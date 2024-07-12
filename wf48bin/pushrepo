@@ -1,0 +1,36 @@
+#!/bin/bash
+REPOS=$HOME/repos
+
+. get_judge_info
+
+if test $# -ne 1
+then
+	echo Usage: $0 reponame
+	exit 1
+fi
+r=$1
+if test ! -d ${REPOS}
+then
+	echo $0: Can not find the repos folder: $REPOS
+	exit 3
+fi
+cd ${REPOS}
+if test ! -d $r
+then
+	echo $0: No repo: ${REPOS}/$r does not exist
+	exit 2
+fi
+
+src=$r
+dst=repos
+hostlist="${SERVER_USER}@${PC2SERVER}"
+
+for j in ${JUDGE_LIST}
+do
+	hostlist=$hostlist" $JUDGE_USER@$j"
+done
+for host in ${hostlist}
+do
+	echo Rsyncing "$src" to "$host:$dst" 
+	rsync -4ae ssh "$src" "$host:$dst"
+done

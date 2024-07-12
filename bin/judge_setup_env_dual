@@ -1,8 +1,10 @@
 # This file is meant to be called using ". judge_setup_env"
 # It sets up various variables.
-JUDGES=`cat $HOME/autojudges.txt`
-ALL_JUDGE_LIST="${JUDGES}"
+JUDGES_46=`cat $HOME/autojudges_46.txt`
+JUDGES_47=`cat $HOME/autojudges_47.txt`
+ALL_JUDGE_LIST="${JUDGES_46} ${JUDGES_47}"
 hostnum=`sed -e 's/.*[^0-9]\([0-9][0-9]*\)$/\1/' < /etc/hostname`
+CCS_BASE_47=10
 CCS_MAX=10
 if test -z ${hostnum}
 then
@@ -11,12 +13,20 @@ elif test ${hostnum} -gt ${CCS_MAX}
 then
 	hostnum=1
 fi
-AJ_BASE=1
-JUDGE_LIST=${JUDGES}
-JUDGEUSER=icpc
+if test ${hostnum} -ge ${CCS_BASE_47}
+then
+	contest=47
+	AJ_BASE=11
+	JUDGE_LIST=${JUDGES_47}
+else
+	contest=46
+	AJ_BASE=1
+	JUDGE_LIST=${JUDGES_46}
+fi
+JUDGEUSER=icpc2023
 if ! getent passwd ${JUDGEUSER} >/dev/null 2>&1
 then
-	JUDGEUSER=icpc
+	JUDGEUSER=ubuntu
 fi
 URLBASE=
 #URLBASE=.icpc-vcss.org

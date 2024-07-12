@@ -19,6 +19,6 @@ do
 	judge=$((judge+1))
 	j=$JUDGEUSER@pc2-aj$judgeno$URLBASE
 	echo Starting judge $judgeno "(index $judge)" on $j
-	ssh $j /home/ubuntu/repos/icpc-utils/bin/RemoteStartJudgeByNumber.sh $judge
+	ssh $j bash -l RemoteStartJudgeByNumber.sh $judge
 	sleep 1
 done

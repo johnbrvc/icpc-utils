@@ -1,0 +1,16 @@
+#!/bin/bash
+if test $# -ne 2
+then
+	echo Usage: $0 source dest
+	exit 1
+fi
+src=$1
+dst=$2
+. get_judge_info
+#
+# Extracts hostnames matching "$JUDGE_PREFIX" followed by numbers
+for j in ${JUDGE_LIST}
+do
+	echo Copying "$src" to "$JUDGE_USER@$j:$dst"
+	scp -4 -p "$src" "$JUDGE_USER@$j:$dst"
+done
