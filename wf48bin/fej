@@ -1,10 +1,15 @@
 #!/bin/bash
-. get_judge_info
 args="$*"
+. get_judge_info
 for j in ${JUDGE_LIST}
 do
-	host="$JUDGE_USER@$j"
-	echo '***************' Judge $j '******************'
-	ssh -4 $host "$args"
+	if ! IsSameHost "$j"
+	then
+		host="$JUDGE_USER@$j"
+		echo '***************' Judge $j '******************'
+		ssh -4 $host "$args"
+	else
+		echo "Skipping self $j"
+	fi
 done
 

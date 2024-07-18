@@ -1,6 +1,8 @@
 #!/bin/bash
 REPOS=$HOME/repos
 
+. get_judge_info
+
 
 if test $# -ne 1
 then
@@ -20,22 +22,32 @@ then
 	exit 2
 fi
 
+set `getent hosts $(hostname) | grep -v 127.0`
+MYIP="$1"
+if test -z "$MYIP"
+then
+	echo $0: Can not figure out my IP address
+	exit 1
+fi
+
 src=$r
 dst=repos
 
-. get_judge_info
-
-
-if IsSameHost ${PC2SERVER}
+set `getent hosts ${PC2SERVER} | grep -v 127.0`
+if test "$1" = "$MYIP"
 then
-	echo Skipping myself as server: $PC2SERVER...
-else
-	hostlist="${SERVER_USER}@${PC2SERVER}"
+	echo Skipping myself: $j
+	continue
 fi
+
+hostlist="${SERVER_USER}@${PC2SERVER}"
 
 for j in ${JUDGE_LIST}
 do
-	if IsSameHost "$j"
+	echo testing $j...
+	read a
+	set `getent hosts $j | grep -v 127.0`
+	if test "$1" = "$MYIP"
 	then
 		echo Skipping myself: $j
 		continue
@@ -45,5 +57,5 @@ done
 for host in ${hostlist}
 do
 	echo Rsyncing "$src" to "$host:$dst" 
-	rsync -4ae ssh "$src" "$host:$dst"
+	echo Would: rsync -4ae ssh "$src" "$host:$dst"
 done
