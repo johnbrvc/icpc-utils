@@ -1,6 +1,6 @@
 #!/bin/bash
 cd $HOME
-pids=`pgrep -u $USER java`
+pids=`pgrep -U $USER -f "Starter --login j"`
 if test -n "$pids"
 then
 	echo $0: killing $pids for $USER
@@ -9,4 +9,3 @@ else
 	echo $0: No $USER running.
 fi
 exit 0
-
