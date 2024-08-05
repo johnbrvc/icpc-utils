@@ -3,7 +3,7 @@
 if [[ $0 == *StopJudg* ]]
 then
 	cmd=RemoteStopJudgeByNumber.sh
-	str=Stop
+	str=Stopp
 else
 	cmd=RemoteStartJudgeByNumber.sh
 	str=Start

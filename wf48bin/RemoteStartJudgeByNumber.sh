@@ -27,7 +27,7 @@ then
 	exit 2
 fi
 
-pids=`pgrep -u $USER java`
+pids=`pgrep -U $USER -f "Starter --login j"`
 if test -n "$pids"
 then
 	echo $0: It looks like $USER is already running.
