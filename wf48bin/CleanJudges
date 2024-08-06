@@ -14,7 +14,7 @@ do
 		host="$JUDGE_USER@$j"
 		judge=${j#"$JUDGE_PREFIX"}
 		echo '***************' Cleaning Judge $judge on $host '******************'
-		echo ssh -4 $host "/home/${JUDGE_USER}/repos/icpc-utils/wf48bin/pc2clean"
+		ssh -4 $host "/home/${JUDGE_USER}/repos/icpc-utils/wf48bin/pc2clean"
 		cnt=$((cnt+1))
 		if test $cnt -ge $jcnt
 		then
