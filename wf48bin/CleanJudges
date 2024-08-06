@@ -1,0 +1,26 @@
+#!/bin/bash
+. get_judge_info
+if test $# -eq 1
+then
+	jcnt=$1
+else
+	jcnt=100
+fi
+cnt=0
+for j in ${JUDGE_LIST}
+do
+	if ! IsSameHost "$j"
+	then
+		host="$JUDGE_USER@$j"
+		judge=${j#"$JUDGE_PREFIX"}
+		echo '***************' Cleaning Judge $judge on $host '******************'
+		echo ssh -4 $host "/home/${JUDGE_USER}/repos/icpc-utils/wf48bin/pc2clean"
+		cnt=$((cnt+1))
+		if test $cnt -ge $jcnt
+		then
+			break
+		fi
+	else
+		echo "Skipping self $j"
+	fi
+done
