@@ -1,0 +1,118 @@
+#!/bin/bash
+cd /home/ubuntu/pc2
+PATH=$PATH:/home/ubuntu/repos/icpc-utils/bin:/usr/pc2/bin
+STOP_LOG=/home/ubuntu/pc2/pc2-stop.log
+echo `date` Starting pc2 shutdown >> $STOP_LOG
+ADMIN1PASSWORD="administrator1"
+if [[ $0 =~ .*/StopContest ]]
+then
+	stoponly=1
+	echo "Stopping contest..."
+else
+	stoponly=0
+
+	if test $# -ne 1
+	then
+		echo Usage: $0 "practice|real"
+		exit 1
+	fi
+	contest=$1
+	newprop=profiles.properties-$contest
+	if test ! -s "$newprop"
+	then
+		echo $newprop does not exist - can not switch/start contest
+		exit 2
+	fi
+fi
+
+echo Stopping judges...
+echo Stopping judges... >> $STOP_LOG
+StopJudges
+echo Killing off WTI...
+echo Killing off WTI... >> $STOP_LOG
+# Kill off WTI
+pid=`ps -C java -o pid,args | grep WebTeam | sed -e 's/^  *//' -e 's/ .*//'`
+if test -n "$pid"
+then
+	kill "$pid"
+else
+	echo WTI is not running.
+fi
+echo Signaling server to shutdown ...
+echo Signaling server to shutdown ... >> $STOP_LOG
+# Kill off server
+pc2tools --shutdown --login administrator1 --password $ADMIN1PASSWORD >>$STOP_LOG 2>&1
+
+echo Waiting for server to shutdown...
+echo Waiting for server to shutdown... >> $STOP_LOG
+cnt=1
+while true
+do
+	pid=`ps -C java -o pid,args | grep contestpassword | sed -e 's/^  *//' -e 's/ .*//'`
+	if test -n "$pid"
+	then
+		sleep 1
+		echo Waiting $cnt ...
+		echo Waiting $cnt ... >> $STOP_LOG
+		cnt=$((cnt+1))
+	else
+		break
+	fi
+done
+
+echo Killing straggler pc2 clients ...
+echo Killing straggler pc2 clients ... >> $STOP_LOG
+while true
+do
+	pids=`ps -C java -o pid,args | grep pc2.Starter | sed -e 's/^  *//' -e 's/ .*//'`
+	if test -z "$pids"
+	then
+		break
+	fi
+	for pid in $pids
+	do
+		echo Killing $pid ...
+		kill $pid
+	done
+	sleep 1
+done
+
+if test $stoponly -eq 1
+then
+	echo Everything should be stopped.
+	echo `date` Everything should be stopped. >> $STOP_LOG
+	exit 0
+fi
+echo `date` Stopped. >> $STOP_LOG
+
+#### if test -z "$contest"
+#### then
+#### 	echo $0: No contest is set - aborting
+#### 	exit 3
+#### fi
+#### contpath=$HOME/repos/PacNWSpring2024/contests/$contest
+#### echo Linking current to $contpath
+#### cd ~/pc2
+#### rm current
+#### ln -s $contpath current
+#### if test -s profiles.properties
+#### then
+#### 	mv profiles.properties profiles.properties-`date '+%Y%m%d-%H%M%S'`
+#### fi
+#### cp profiles.properties-$contest profiles.properties
+#### echo Cleaning scoreboard HTML
+#### rm -f $HOME/pc2/wti/WebTeamInterface-1.1/WebContent/WTI-UI/scoreboard/*.html $HOME/WebTeamInterface-1.1/WebContent/WTI-UI/scoreboard/*.php
+#### rm -f $HOME/pc2/wti/WebTeamInterface-1.1/WebContent/WTI-UI/secret/*.html  $HOME/WebTeamInterface-1.1/WebContent/WTI-UI/secret/*.php
+#### echo Changing problem statement links for web page
+#### rm -f $HOME/pc2/wti/WebTeamInterface-1.1/WebContent/WTI-UI/problems
+#### ln -s $HOME/webcontent/problems_GNY2023-$contest $HOME/WebTeamInterface-1.1/WebContent/WTI-UI/problems
+#### echo Starting up $contest
+#### StartServer --nogui
+#### sleep 10
+#### #StartBoard b1 --nogui
+#### sleep 5
+#### #StartFeeder ef1 --nogui
+#### sleep 5
+#### StartJudges
+#### #../StartWTI
+exit 0
