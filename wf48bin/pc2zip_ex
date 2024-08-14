@@ -1,0 +1,24 @@
+#!/bin/bash
+CONTEST_LINK=$HOME/pc2/current
+if ! test -d $HOME/pc2
+then
+	echo $HOME/pc2 does not exist.
+	exit 1
+fi
+
+dt=`date +%Y%m%d_%H%M%S`
+contest=""
+
+if test -L ${CONTEST_LINK}
+then
+	lnkdata=`readlink ${CONTEST_LINK}`
+	contest=_${lnkdata#*contests/}
+else
+	echo Notice: could not determine contest - no ${CONTEST_LINK} found
+fi
+
+zipfile=$HOME/ex_folders${contest}_${dt}.zip
+echo Creating $zipfile ... this could take some time ...
+cd $HOME
+zip -r -q $zipfile  pc2/ex_[0-9]*_[A-Z]_*_*_* pc2/jlog*
+rm -rf pc2/ex_[0-9]*_[A-Z]_*_*_* pc2/jlog*
