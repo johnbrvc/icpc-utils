@@ -7,7 +7,7 @@ do
 	then
 		host="$JUDGE_USER@$j"
 		echo '***************' Judge $j '******************'
-		ssh -4 $host "$args"
+		ssh -4 $host 'export PATH=$PATH:$HOME/repos/icpc-utils/wf48bin;'"$args"
 	else
 		echo "Skipping self $j"
 	fi
