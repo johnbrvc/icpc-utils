@@ -1,0 +1,62 @@
+#!/bin/bash
+## Usage: cpcontestenv user@host
+#
+#DEBUG="echo Would:"
+DEBUG=
+#DEBUG_ROOT="echo Root Would:"
+DEBUG_ROOT=
+
+if test $# -ne 1
+then
+	echo Usage: $0 user@host
+	echo "      eg: $0 icpc@pc2-aj1"
+	exit 1
+fi
+destuser="$1"
+destlogin=${destuser%@*}
+desthome=/home/${destlogin}
+rootuser=root@"${destuser#*@}"
+
+echo desthome is ${desthome}
+echo rootuser is ${rootuser}
+echo Changing mode of ${desthome} to 751
+$DEBUG ssh -4 $destuser "chmod 751 ${desthome}"
+echo Adding $destlogin to sudoers ...
+$DEBUG_ROOT ssh -4 "${rootuser}" "usermod -aG sudo ${destlogin}"
+echo Rsync-ing home ...
+$DEBUG rsync -az \
+	--exclude "ex_[0-9]*" \
+	--exclude "probdir[0-9]*" \
+	--exclude "exedir[0-9]*" \
+	--exclude "pc2/logs" \
+	--exclude "pc2/*.log" \
+	--exclude "pc2/reports" \
+	--exclude "pc2/results" \
+	--exclude "pc2/?log" \
+	--exclude "pc2/profile*" \
+	html pc2 .gitconfig cppc2.sh cpcontestenv "$rootuser:${desthome}"
+echo Rsync /etc/profile.d/icpc-utils.sh ...
+$DEBUG rsync -az /etc/profile.d/icpc-utils.sh "$rootuser:/etc/profile.d/icpc-utils.sh"
+# not harmful if already installed
+echo Installing apache...
+$DEBUG_ROOT ssh -4 "$rootuser" "apt-get -y install apache2"
+echo Copying judge.conf apache config ...
+$DEBUG rsync -az /etc/apache2/sites-available/judge.conf "$rootuser:/etc/apache2/sites-available/judge.conf"
+echo Copying apache ports.conf config ...
+$DEBUG rsync -az /etc/apache2/ports.conf "$rootuser:/etc/apache2/ports.conf"
+# not harmful if already done
+echo Enabling apache modules and sites ...
+$DEBUG_ROOT ssh -4 "$rootuser" "a2enmod cgi; a2ensite judge; a2dissite 000-default"
+echo Sleeping a few seconds ...
+sleep 5
+echo Restarting apache ...
+$DEBUG_ROOT ssh -4 "$rootuser" "apachectl restart"
+echo Re-Restarting apache - apparently this is needed because cgid doesnt start after the first one.
+sleep 2
+$DEBUG_ROOT ssh -4 "$rootuser" "apachectl restart"
+#echo Creating repos directory ...
+#$DEBUG ssh -4 $destuser "mkdir repos; chmod 751 repos"
+#echo Pushing icpc-utils repo ...
+#$DEBUG pushrepo icpc-utils
+#echo Pushing wfastana repo ...
+#$DEBUG pushrepo wfastana
