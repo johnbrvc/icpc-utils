@@ -1,0 +1,11 @@
+#!/bin/bash
+cd $HOME/pc2
+if test $# -gt 0
+then
+	user="$*"
+else
+	user=${USER##*[a-zA-Z]}
+	user=a$((user+1))
+fi
+pc2admin --login $user $PC2CLIENTOPTS >alog 2>&1 &
+
