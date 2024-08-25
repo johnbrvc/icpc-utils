@@ -20,7 +20,7 @@ SERVER_USER=icpc
 PC2SERVER=pc2
 
 # Get my ip address
-set `getent hosts $(hostname) | grep -v 127.0`
+set `getent ahostsv4 $(hostname) | grep -v 127.0 | grep -v STREAM`
 MYIP="$1"
 if test -z "$MYIP"
 then
@@ -35,7 +35,7 @@ IsSameHost()
 	then
 		return 0
 	fi
-	set `getent hosts "$_chkhost" | grep -v 127.0`
+	set `getent ahostsv4 "$_chkhost" | grep -v 127.0 | grep -v STREAM`
 	if test "$1" = "$MYIP"
 	then
 		return 0
