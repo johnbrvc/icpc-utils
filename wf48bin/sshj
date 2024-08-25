@@ -1,13 +1,16 @@
 #!/bin/bash
-. get_judge_info
 
 if test $# -ne 1
 then
 	echo Usage: $0 judge'#'
+	. get_judge_info
 	echo Available judges are: `echo ${JUDGE_LIST} | sed -e "s/${JUDGE_PREFIX}//g"`
 	exit 1
 fi
 j=$1
+
+. get_judge_info
+
 if [[ $j == [0-9]* ]]
 then
 	j=${JUDGE_PREFIX}$j

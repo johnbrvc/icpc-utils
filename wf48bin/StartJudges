@@ -1,5 +1,4 @@
 #!/bin/bash
-. get_judge_info
 if [[ $0 == *StopJudg* ]]
 then
 	cmd=RemoteStopJudgeByNumber.sh
@@ -14,6 +13,7 @@ then
 else
 	jcnt=100
 fi
+. get_judge_info
 cnt=0
 for j in ${JUDGE_LIST}
 do
