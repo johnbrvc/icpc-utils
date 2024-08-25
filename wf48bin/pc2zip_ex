@@ -21,4 +21,4 @@ zipfile=$HOME/ex_folders${contest}_${dt}.zip
 echo Creating $zipfile ... this could take some time ...
 cd $HOME
 zip -r -q $zipfile  pc2/ex_[0-9]*_[A-Z]_*_*_* pc2/jlog*
-rm -rf pc2/ex_[0-9]*_[A-Z]_*_*_* pc2/jlog*
+rm -rf pc2/ex_[0-9]*_[A-Z]_*_*_* pc2/jlog* html/cache/*
