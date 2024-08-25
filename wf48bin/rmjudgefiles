@@ -1,10 +1,11 @@
 #!/bin/bash
-CONTEST_LINK=$HOME/pc2/current
-if ! test -d $HOME/pc2
+hdir=/home/icpc
+CONTEST_LINK=$hdir/pc2/current
+if ! test -d $hdir/pc2
 then
-	echo $HOME/pc2 does not exist.
+	echo $hdir/pc2 does not exist.
 	exit 1
 fi
 
-cd $HOME
+cd $hdir
 rm -rf pc2/ex_[0-9]*_[A-Z]_*_*_* html/cache/*
