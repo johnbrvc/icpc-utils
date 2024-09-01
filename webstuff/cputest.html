@@ -1,0 +1,267 @@
+<html>
+<meta http-equiv="Content-type" content="text/html" charset="utf-8" />
+<head>
+<title>PC&#xb2; - System Status</title>
+<style>
+.gcanvas {
+	width:200;
+	height:100;
+    max-width:200px;
+    max-height:100px;
+//        border:1px solid #000000;
+}
+.gcontainer {
+	display: flex;
+    height: 120;
+}
+.glabel {
+	width: 100%;
+	height: 100px;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	margin-top: 0px;
+	line-height: 19px;
+	text-align: center;
+	z-index: 9999999;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+.gstyle {
+	width: 200px;
+	height: 120px;
+    float: left;
+    position: relative;
+}
+
+.jlabel {
+    font-family: Arial, 'Helvetica ICPC', sans-serif;
+    font-weight: bold;
+    text-align: center;
+    height: 120px;
+    padding: 60px 0;
+}
+</style>
+</head>
+<body onload="pgInit()">
+    <div id="judges_container">
+    </div>
+<script src="scripts/chart.js"></script>
+<script src="scripts/jquery-3.7.1.min.js"></script>
+<script type="text/javascript">
+    const UpdateFrequency = 1000;
+    const AutojudgeServer = "pc2-ccsadmin1";
+
+    class CSGauge {
+        constructor(container, instance, colors, label_line2, value, maxvalue, units) {
+            colors.forEach((color) => { this.options.data.datasets[0].backgroundColor.push(color); })
+            this.value = value;
+            this.maxvalue = maxvalue;
+            this.units = units;
+            this.divstyle = document.createElement("div");
+            this.divstyle.className = 'gstyle';
+            container.appendChild(this.divstyle);
+
+            this.divlabel = document.createElement("div");
+            this.divlabel.id = 'glabel' + String(instance);
+            this.divlabel.className = 'glabel';
+            this.divstyle.appendChild(this.divlabel);
+
+            this.canvas = document.createElement("canvas");
+            this.canvas.className = 'gcanvas';
+            this.canvas.id = 'chartJSContainer' + String(instance);
+            this.divstyle.appendChild(this.canvas);
+
+            this.label_line2 = label_line2;
+
+            var ctx = this.canvas.getContext('2d');
+            this.chart = new Chart(ctx, this.options);
+            this.UpdateValue(value);
+        };
+        options = {
+            type: 'doughnut',
+            data: {
+                datasets: [
+                    {
+                        backgroundColor: [],
+                        data: [],
+                    },
+                ],
+            },
+            options: {
+                rotation: 270.0, // start angle in radians
+                circumference: 180.0, // sweep angle in radians
+                tooltips: { enabled: false },
+                hover: { mode: null },
+                events: [],
+            }
+
+        };
+        SetMaxValue(value) {
+            this.maxvalue = value;
+        }
+        UpdateValue(value) {
+            var max;
+            if (this.maxvalue == 0) {
+                max = value;
+            } else {
+                max = this.maxvalue;
+            }
+            var labunits = "";
+            if (!this.units) {
+                labunits = "/" + String(max);
+            } else {
+                labunits = this.units;
+            }
+            if (max == 0 && value == 0) {
+                labunits = "";
+                max = 100;
+            }
+            this.options.data.datasets[0].data.length = 0;
+            this.options.data.datasets[0].data.push((value/max) * 180);
+            this.options.data.datasets[0].data.push(180 - ((value / max) * 180));
+            this.divlabel.innerHTML = String(Math.round(value)) + labunits + "<br>" + this.label_line2;
+            this.chart.update('none');
+        }
+    };	
+
+    // overrides for nodename returned in json
+    let hostoverride = {
+        "pc2-ccsadmin1": "pc2-aj3"
+    };
+    // host name of each judge we are interesting in
+    //let judges = ["pc2-aj1", "pc2-aj2", "pc2-aj3"];
+    let judges = [];
+    // labels to display to left of a judge's gauges
+    //let judgenames = ["Autojudge 1", "Autojudge 2", "Autojudge 3"];
+    let judgenames = [];
+    // is a request pending
+    let reqpending = [false, false, false, false, false, false, false, false, false, false, false, false ];
+    // number of judgments for each judge
+    let numjudgments = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+    let totaljudgments = 0;
+    // the gauges array for each judge
+    let judgeinfo = [];
+    // suffix for value displayed for each gauge
+    let units = ["%", "", "%", "%"];
+    // 2nd line of label (under value displayed)
+    let labels = ["CPU 3", "Judgments", "System", "Disk"];
+    // max value of the gauge (typically, 100 is a percent)
+    let gaugemax = [100, 0, 100, 100];
+
+    // Process response from a getjudgehostnames.sh remote request
+    function getjudgehostnamesResp(json) {
+
+        console.log("  --> Got response from for judge host names: " + json.length + " judges");
+	var jno = 1;
+	json.forEach((judge) => {
+		console.log("  " + judge);
+		judges.push(judge);
+		judgenames.push("Autojudge " + String(jno));
+		jno++;
+	});
+	if(judges.length != 0){
+		finishStartup();
+	} else {
+		console.log("No judges returned - page will not update");
+	}
+    };
+
+    // Request CPU info from each host
+    function getjudgehostnamesReq() {
+        console.log("Try judgehostname server  " + AutojudgeServer);
+        $.ajax({
+            url: "http://" + AutojudgeServer + "/cgi-bin/getjudgehostnames.sh",
+            method: "GET"
+        }).done(getjudgehostnamesResp);
+    };
+
+    // Process response from a getcpuinfo.sh remote request
+    function cpuinfoResp(json) {
+        var hostinfo = json.cpuinfo.sysstat.hosts[0];
+        var nodename = hostoverride[hostinfo.nodename];
+        if (!nodename) {
+            nodename = hostinfo.nodename;
+        }
+        var nodenum = judges.indexOf(nodename);
+        console.log("  --> Got response from " + hostinfo.nodename + "(" + nodename + ") (index=" + nodenum + ")");
+        if (nodenum >= 0 && nodenum < judgeinfo.length) {
+            reqpending[nodenum] = false;
+            var gauges = judgeinfo[nodenum];
+            var cpuinfo = hostinfo.statistics[0]['cpu-load'][0];
+            cpuall = cpuinfo.usr + cpuinfo.nice + cpuinfo.sys;
+            cpuinfo = hostinfo.statistics[0]['cpu-load'][4];
+            cpu3 = cpuinfo.usr + cpuinfo.nice + cpuinfo.sys;
+            console.log("      " + judgenames[nodenum] + ": cpu3=" + cpu3 + " system=" + cpuall + " judgments=" + json.judgments + " diskused=" + json.diskused);
+            gauges[0].UpdateValue(cpu3);
+            gauges[2].UpdateValue(cpuall);
+            // Keep total judgments up-to-date
+            var numj = json.judgments;
+            if (numjudgments[nodenum] != numj) {
+                totaljudgments += numj - numjudgments[nodenum];
+                numjudgments[nodenum] = numj;
+            }
+            gauges[1].SetMaxValue(totaljudgments);
+            gauges[1].UpdateValue(numj);
+            gauges[3].UpdateValue(json.diskused);
+        }
+
+    };
+
+    // Request CPU info from each host
+    function cpuinfoReq() {
+        var judge;
+        for (j = 0; j < judges.length; j++) {
+            judge = judges[j];
+            if (reqpending[j]) {
+                console.log("Skipping judge " + judge + " since a request is pending");
+            } else {
+                console.log("Try judge " + judge);
+                reqpending[j] = true;
+                $.ajax({
+                    url: "http://" + judge + "/cgi-bin/getcpuinfo.sh",
+                    method: "GET"
+                }).done(cpuinfoResp);
+            }
+        }
+    };
+
+    function pgInit() {
+	getjudgehostnamesReq();
+    }
+
+    function finishStartup() {
+	console.log("Finishing startup now that we have " + judges.length + " judge host names");
+
+        var judges_div = document.getElementById("judges_container");
+
+        // For each judge, we have to create its div line and gauges
+        for (j = 0; j < judges.length; j++) {
+            console.log("Setting up judge " + judgenames[j] + "(" + judges[j] + ") index " + j);
+            var divjudge = document.createElement("div");
+            divjudge.className = 'gcontainer';
+            divjudge.id = "gcontainer" + String(j);
+            if (j > 0) {
+                divjudge.innerHTML = "<p>";
+            }
+            judges_div.appendChild(divjudge);
+
+            // Now the label for judge
+            var labjudge = document.createElement("div");
+            labjudge.className = "jlabel";
+            labjudge.innerHTML = judgenames[j];
+            divjudge.appendChild(labjudge);
+
+            let gauges = [];
+            // create a gauge for each metric.  TODO: colors
+            for (i = 0; i < labels.length; i++) {
+                gauges.push(new CSGauge(divjudge, j*100 + i, ['rgb(99, 255, 132)', '#ccc'], labels[i], 0, gaugemax[i], units[i]));
+            }
+            judgeinfo.push(gauges);
+        }
+        cpuinfoReq();
+        var intTimer = setInterval(cpuinfoReq, UpdateFrequency);
+    };
+</script>
+</body>
+</html>
