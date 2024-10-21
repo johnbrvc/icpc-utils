@@ -1,0 +1,12 @@
+#!/bin/bash
+cd $HOME/pc2
+rm -rf profiles.properties profiles logs alog slog  ex_[1-9]* jlog_* alog_* elog_*
+cd $HOME
+if test -d html
+then
+	cd html
+	rm -f probdir[0-9]* exedir[0-9]*
+fi
+cd $HOME
+exit 0
+

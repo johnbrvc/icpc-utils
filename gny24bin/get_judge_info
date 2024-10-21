@@ -1,0 +1,44 @@
+#
+# This bash source file will extract all pc2 autojudges from the /etc/hosts file
+# It also sets up the judge user.
+HOSTS_FILE=/etc/hosts
+#HOSTS_FILE=hosts.test
+
+# For root commands, use root user, otherwise use icpc user
+if [[ $0 == *root ]]
+then
+	JUDGE_USER=root
+else
+	JUDGE_USER=icpc
+fi
+JUDGE_PREFIX=pc2-aj
+#
+# Extracts hostnames matching "$JUDGE_PREFIX" followed by numbers
+JUDGE_LIST=`sed -nE -e "s/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}[[:space:]]+(${JUDGE_PREFIX}[0-9][0-9]*)/\1/p" ${HOSTS_FILE}`
+
+SERVER_USER=icpc
+PC2SERVER=pc2
+
+# Get my ip address
+set `getent ahostsv4 $(hostname) | grep -v 127.0 | grep -v STREAM`
+MYIP="$1"
+if test -z "$MYIP"
+then
+        echo $0: Can not figure out my IP address - no entry in hosts for $(hostname)
+        exit 1
+fi
+
+IsSameHost()
+{
+	_chkhost="$1"
+	if test -z "$_chkhost"
+	then
+		return 0
+	fi
+	set `getent ahostsv4 "$_chkhost" | grep -v 127.0 | grep -v STREAM`
+	if test "$1" = "$MYIP"
+	then
+		return 0
+	fi
+	return 1
+}

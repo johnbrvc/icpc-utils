@@ -1,0 +1,12 @@
+#!/bin/bash
+. get_judge_info
+
+echo '***************' Server $PC2SERVER '***************'
+ssh -4 ${SERVER_USER}@${PC2SERVER} "cat /proc/loadavg | cut --delim=' ' -f1"
+for j in ${JUDGE_LIST}
+do
+	host="${JUDGE_USER}@$j"
+	echo '***************' $j '******************'
+	ssh -4 $host "cat /proc/loadavg | cut --delim=' ' -f1"
+done
+

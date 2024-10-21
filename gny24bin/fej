@@ -1,0 +1,15 @@
+#!/bin/bash
+args="$*"
+. get_judge_info
+for j in ${JUDGE_LIST}
+do
+	if ! IsSameHost "$j"
+	then
+		host="$JUDGE_USER@$j"
+		echo '***************' Judge $j '******************'
+		ssh -4 $host 'export PATH=$PATH:$HOME/repos/icpc-utils/wf48bin;'"$args"
+	else
+		echo "Skipping self $j"
+	fi
+done
+

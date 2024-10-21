@@ -1,0 +1,37 @@
+#!/bin/bash
+ICPCUSER=icpc
+
+if test $# -lt 1
+then
+	echo Usage: $0 "repo practice|real" "[--serveronly]"
+	echo "       eg.  $0 GNY2024 practice"
+	exit 1
+fi
+REPO=/home/${ICPCUSER}/repos/$1/contests
+shift
+if test ! -d ${REPO}
+then
+	echo $0: ${REPO} does not exist
+	exit 1
+fi
+if test $# -lt 1 -o $# -gt 2
+then
+	echo Usage: $0 repo "practice|real" "[-serveronly]"
+	echo "      eg. $0 GNY2024 practice"
+	exit 1
+fi
+cpath="${REPO}/$1"
+svr="$2"
+if test ! -d ${cpath}
+then
+	echo Invalid contest path: ${cpath}
+	exit 2
+fi
+cd ~/pc2
+rm current
+ln -s ${cpath} current
+ls -l ~/pc2/current
+if test -z "$svr"
+then
+	fej 'cd pc2; rm current; rm -rf logs ?log; ln -s "'${cpath}'" current; ls -l ~/pc2/current'
+fi

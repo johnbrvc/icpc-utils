@@ -1,0 +1,16 @@
+#!/bin/bash
+#WEB="https://pc2:PacNW@contest.icpc-vss.org:50443"
+#WEB="https://pc2:PacNW@localhost:50443"
+WEB="https://pc2:pusher-upper-crier-purple@domjudge.nac.icpc.global/api/contests/nac"
+
+mkdir -p replay
+
+# No jq command by default, so use json_pp
+json_pp < submissions.json | grep '"id"' | sed -e 's/",$//' -e 's/.*"//' > submission_ids.txt
+for file in `cat submission_ids.txt`
+do
+        of=replay/$file.zip
+        echo $of...
+        wget --no-check-certificate -q -O $of "$WEB"/contest/submissions/$file/files
+done
+
