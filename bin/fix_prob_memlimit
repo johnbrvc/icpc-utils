@@ -1,0 +1,30 @@
+#!/bin/bash
+DEBUG=
+
+if test ! -s problemset.yaml
+then
+	echo $0: Must run this from the config folder
+	exit 1
+fi
+PC2CONFIG=`pwd`
+# Go through each problem folder
+for prob in `grep short-name problemset.yaml | sed -e 's/.* //'`
+do
+	if ! cd $PC2CONFIG/$prob
+	then
+		echo $0: no data folder for problem $prob
+	else
+		if egrep -q "^  *memory:" problem.yaml
+		then
+			echo $prob already has a memory limit set.
+		else
+			# Get correct number of spaces to indent.  We look at the line after the limits: line
+			# and make up a string of leading spaces, minus 1 space.  We do 1 less since we have to
+			# escape a space for the sed "a" command, so that uses one up.
+			spaces=`sed -n -e '/^limits:/{n;s/^[ ]\([ ][ ]*\).*/\1/p;}' < problem.yaml`
+			sed -i -e "/timeout:/a \ ${spaces}memory: 2048" problem.yaml
+		fi
+		cd $PC2CONFIG
+	fi
+done
+exit 0

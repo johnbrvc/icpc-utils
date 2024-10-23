@@ -1,0 +1,32 @@
+#!/bin/bash
+for dir in *
+do
+	if test -d $dir
+	then
+		logo=$dir/logo.png
+		if test ! -s ../../new/organizations/$logo
+		then
+			if test ! -d ../../new/organizations/$dir
+			then
+				echo ../../new/organizations/$dir is missing
+			else
+				fnd=`ls ../../new/organizations/$dir/*`
+				logo=`ls $dir/*`
+				if test -z "$logo"
+				then
+					echo organizations/$dir/* not found, but found $fnd
+				elif cmp -s "$logo" "$fnd"
+				then
+					:
+				else
+					echo "$logo" not found, but found "$fnd" which is different $?
+				fi
+			fi
+		else
+			if ! cmp -s $logo "../../new/organizations/$logo"
+			then
+					echo $logo does not compare
+			fi
+		fi
+	fi
+done
